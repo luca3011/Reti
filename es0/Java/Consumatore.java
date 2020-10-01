@@ -24,6 +24,7 @@ public class Consumatore {
             }
         catch(IOException ex)
             {System.out.println("Errore di input"); System.exit(2);}
+        
     }
 
 }
