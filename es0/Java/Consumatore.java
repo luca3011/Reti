@@ -6,18 +6,28 @@ public class Consumatore {
     {
         FileReader r = null;
         // fare controllo argomenti
-        if (args.length != 1){
-            System.out.println("Utilizzo: produttore <inputFilename>");
+        if (args.length != 2){
+            System.out.println("Utilizzo: consumatore <prefixstring> <inputFilename>");
             System.exit(0);
         }
-        try { r = new FileReader(args[0]); }
+
+        String stringa = args[0];
+
+        try { r = new FileReader(args[1]); }
         catch(FileNotFoundException e)
             { System.out.println("File non trovato"); System.exit(1);}
         
+        int flag = 0;
+
         try { 
             int x; char ch;
             while ((x = r.read()) >=0){   
                 ch = (char) x;
+
+                //filtro stringa
+                
+
+
                 System.out.print(ch);
             }
             r.close();
