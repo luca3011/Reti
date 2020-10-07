@@ -1,29 +1,28 @@
+import java.io.BufferedReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Scanner;
 
-import java.io.*;
 public class Produttore{
-    public static void main(final String[] args)
-    { 
-        BufferedReader in = null; int res = 0;
-        // fare controllo argomenti
+    public static void main(String[] args){
+        BufferedReader in = null;
+        // Controllo argomenti
         if (args.length != 1){
-            System.out.println("Utilizzo: produttore <inputFilename>");
+            System.out.println("Utilizzo: produttore <filename>");
             System.exit(0);
-            }
-        in = new BufferedReader(new InputStreamReader(System.in));
-    
-    FileWriter fout;
-    try { fout = new FileWriter(args[0]);
-        System.out.println("Quante righe vuoi inserire?");
-        res = Integer.parseInt(in.readLine());
-        for (int i =0; i<res; i++)
-        { 
-            System.out.println("Inserisci la nuova riga");
-            final String inputl = in.readLine()+"\n";
-            fout.write(inputl, 0, inputl.length());
         }
-        fout.close();
-    }
-    catch (final NumberFormatException nfe) {nfe.printStackTrace(); System.exit(1);}
-    catch (final IOException e) {e.printStackTrace(); System.exit(2);}
+        in = new BufferedReader(new InputStreamReader(System.in));
+        FileWriter fout;
+        int read_char;
+        int line = 0;
+        try { fout = new FileWriter(args[0]);
+            while ((read_char = in.read()) != -1){
+                fout.write(read_char);
+            }
+            fout.close();
+        }
+        catch (NumberFormatException nfe) {nfe.printStackTrace(); System.exit(1);}
+        catch (IOException e) {e.printStackTrace(); System.exit(2);}
     }
 }
