@@ -20,7 +20,6 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
-    // lettura righe
     file_out = argv[1];
 
     fd = open(file_out, O_WRONLY | O_CREAT | O_TRUNC, 00640);
