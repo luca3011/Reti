@@ -1,4 +1,4 @@
-package es0;
+
 import java.io.*;
 public class Produttore{
     public static void main(final String[] args)

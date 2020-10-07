@@ -31,16 +31,13 @@ public class Consumatore {
                 //filtro stringa
                 if(ch==nextChar)
                 {
-                    flag++;
-                    appoggio = appoggio + ch;
-                    nextChar = stringa.charAt(flag);
-                    while(((x=r.read())>=0) && ((char)x==nextChar) && (flag < l-1) )
+                    do
                     {   
                         ch=(char) x;
                         flag++;
                         appoggio = appoggio+ch;
                         nextChar = stringa.charAt(flag);
-                    }
+                    }while(((x=r.read())>=0) && ((char)x==nextChar) && (flag < l-1) );
                     appoggio="";
                     flag=0;
                     nextChar = stringa.charAt(0);
