@@ -14,7 +14,6 @@ public class Produttore{
         }
         in = new BufferedReader(new InputStreamReader(System.in));
         FileWriter fout;
-        //Scanner sc = new Scanner(System.in);
         int read_char;
         int line = 0;
         try { fout = new FileWriter(args[0]);
