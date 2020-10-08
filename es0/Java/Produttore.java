@@ -2,7 +2,6 @@ import java.io.BufferedReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Scanner;
 
 public class Produttore{
     public static void main(String[] args){
@@ -15,7 +14,6 @@ public class Produttore{
         in = new BufferedReader(new InputStreamReader(System.in));
         FileWriter fout;
         int read_char;
-        int line = 0;
         try { fout = new FileWriter(args[0]);
             while ((read_char = in.read()) != -1){
                 fout.write(read_char);
