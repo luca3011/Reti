@@ -3,7 +3,7 @@ import static java.lang.Integer.parseInt;
 
 import java.io.*;
 
-public class Consumatore2 {
+public class Consumatore {
 
     public static void main(String[] args) {
         Reader r = null;
