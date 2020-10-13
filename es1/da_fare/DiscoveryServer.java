@@ -10,7 +10,6 @@ import java.util.HashMap;
 
 public class DiscoveryServer {
 
-    private static final int START_PORT = 1024; //numero (escluso) da cui si iniziano a generare le porte dei vari RowSwap
     public static void main(String[] args)
     {
         DatagramSocket socket = null;
@@ -77,8 +76,11 @@ public class DiscoveryServer {
                 try{
                     boStream = new ByteArrayOutputStream();
                     doStream = new DataOutputStream(boStream);
-                    //da fixare
-                    portaRisposta = portMap.get(richiesta);     //attenzione: può restituire null
+                    portaRisposta = portMap.get(richiesta); //attenzione: può restituire null
+                    if (portaRisposta == null) {
+                        System.out.println("Errore: file richiesto non disponibile");
+                        System.exit(5);
+                    }
                     doStream.writeUTF(portaRisposta);
                     data = boStream.toByteArray();
                     packet.setData(data);
