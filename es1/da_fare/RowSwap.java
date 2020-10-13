@@ -7,7 +7,7 @@ public class RowSwap extends Thread {
 	int port;
 	String[] nomeFile;
 	
-    public RowSwap(int porta, String[] nomefile)
+    public RowSwap(int porta, String nomefile)
     {
     	this.port=porta;
     	this.nomeFile=nomefile;
