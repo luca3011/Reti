@@ -1,8 +1,8 @@
 public class DiscoveryServer {
 
-    public static void main(Strtin[] args)
+    public static void main(String[] args)
     {
-        //roba
+        //robaa
     }
     
 }
