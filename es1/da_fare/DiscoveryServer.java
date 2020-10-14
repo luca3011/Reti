@@ -15,7 +15,7 @@ public class DiscoveryServer {
         DatagramSocket socket = null;
         DatagramPacket packet = null;
         byte[] buf = new byte[256];
-        int discoveryServerPort;
+        int discoveryServerPort = -1;
         
         if(args.length % 2 == 0){    //non torna il numero di argomenti
                 System.out.println("Usage: DiscoveryServer port {file1 port1 ... fileN portN}");
@@ -29,9 +29,10 @@ public class DiscoveryServer {
             System.exit(2);
         }
 
-        HashMap portMap = new HashMap<String, Integer>();
-        for (int i = 1; i < ((args.length)/2)+1; i++) {     // una iterazione per ogni coppia file-porta
-            int rowSwapPort = args[i + 1];
+        HashMap<String, Integer> portMap = new HashMap<String, Integer>();
+        for (int i = 1; i < args.length; i += 2) { // una iterazione per ogni coppia file-porta
+            String filename = args[i];
+            int rowSwapPort = Integer.parseInt(args[i + 1]);
             if (portMap.containsValue(rowSwapPort)) {
                 System.out.println("Errore: inserita una o più porte duplicate");
                 System.exit(3);
@@ -39,6 +40,7 @@ public class DiscoveryServer {
             RowSwap rowSwap = new RowSwap(rowSwapPort, args[i]);
             portMap.put(args[i], rowSwapPort);
             rowSwap.start();
+            System.out.println("Coppia: file " + filename + " porta " + rowSwapPort);
         }
         
         try{
@@ -50,7 +52,7 @@ public class DiscoveryServer {
         }
         try{
             String richiesta = null;
-            String portaRisposta = null;
+            Integer portaRisposta;
             ByteArrayInputStream biStream = null;
             DataInputStream diStream = null;
             ByteArrayOutputStream boStream = null;
@@ -76,12 +78,12 @@ public class DiscoveryServer {
                 try{
                     boStream = new ByteArrayOutputStream();
                     doStream = new DataOutputStream(boStream);
-                    portaRisposta = portMap.get(richiesta); //attenzione: può restituire null
+                    portaRisposta = (Integer)portMap.get(richiesta); //attenzione: può restituire null
                     if (portaRisposta == null) {
                         System.out.println("Errore: file richiesto non disponibile");
                         System.exit(5);
                     }
-                    doStream.writeUTF(portaRisposta);
+                    doStream.writeUTF(portaRisposta.toString());
                     data = boStream.toByteArray();
                     packet.setData(data);
                     socket.send(packet);

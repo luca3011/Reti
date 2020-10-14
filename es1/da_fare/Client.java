@@ -17,7 +17,6 @@ public class Client {
 		int port=-1, numLinea1=-1, numLinea2=-1;
 		String fileName=null, richiesta=null, numBuf=null, result=null; 
 		byte[] buf=new byte[256];
-		Boolean error=false;
 		
 		DatagramSocket socket=null;
 		DatagramPacket packet=null;
@@ -31,7 +30,7 @@ public class Client {
 			{
 				addr = InetAddress.getByName (args[0]);
 				port = Integer.parseInt (args[1]);
-				fileName=args[3];
+				fileName=args[2];
 			}
 		}catch(UnknownHostException e) { System.out.println("errore con gli argomenti");e.printStackTrace();System.exit(-1);}
 		
@@ -64,7 +63,7 @@ public class Client {
         	biStream = new ByteArrayInputStream( packet.getData(),0,packet.getLength());
         	diStream = new DataInputStream(biStream);
         	port = Integer.parseInt(diStream.readUTF()); 
-        	
+        	System.out.println("Porta ricevuta: " + port);
         }catch (IOException e){ System.out.println("errore nella traduzione dal DS");e.printStackTrace();System.exit(-5);}
         
         System.out.println("Connessione avvenuta, inserire il numero delle righe:()");
@@ -72,65 +71,60 @@ public class Client {
         { 
         	
         	try
-        	{   numLinea1 = Integer.parseInt(numBuf);		//lettura numeri righe da console
+			{
+				numLinea1 = Integer.parseInt(numBuf);		//lettura numeri righe da console
         		numLinea2 = Integer.parseInt(System.console().readLine());
         		richiesta = numLinea1+" "+numLinea2;
-        		
-        	
         	}catch (Exception e) {
         		System.out.println("Problemi nell'interazione da console: ");
         		e.printStackTrace();
-        		error=true;
-        		continue;}
+				continue;
+			}
         	
-        	if(error=false) {
-        		try 
-                {
-                	socket = new DatagramSocket();
-        			socket.setSoTimeout(30000);
-        			packet = new DatagramPacket(buf, buf.length, addr, port);
-        		} 
-                catch (SocketException e) {System.out.println("errore con il datagram2");e.printStackTrace();System.exit(-6);}
+        	try {
+                socket = new DatagramSocket();
+        		socket.setSoTimeout(30000);
+        		packet = new DatagramPacket(buf, buf.length, addr, port);
+        	} 
+            catch (SocketException e) {System.out.println("errore con il datagram2");e.printStackTrace();System.exit(-6);}
                 
-                try {
-                	boStream = new ByteArrayOutputStream();
-                	doStream = new DataOutputStream(boStream);
-                	doStream.writeUTF(richiesta);
-                	byte[] data = boStream.toByteArray();
+           	try {
+                boStream = new ByteArrayOutputStream();
+                doStream = new DataOutputStream(boStream);
+                doStream.writeUTF(richiesta);
+            	byte[] data = boStream.toByteArray();
                 
-                	packet.setData(data);
-                	socket.send(packet);
-                }catch (IOException e){System.out.println("errore nell'invio al RS");e.printStackTrace();System.exit(-7);}
+                packet.setData(data);
+                socket.send(packet);
+            }catch (IOException e){System.out.println("errore nell'invio al RS");e.printStackTrace();System.exit(-7);}
                 
-                try {
-                	packet.setData(buf);
-                	socket.receive(packet);
-                }catch(IOException e) {System.out.println("errore nella ricevuta dal RS");e.printStackTrace();System.exit(-8);}
+            try {
+                packet.setData(buf);
+                socket.receive(packet);
+            }catch(IOException e) {System.out.println("errore nella ricevuta dal RS");e.printStackTrace();System.exit(-8);}
                 
-                try{
-                	biStream = new ByteArrayInputStream( packet.getData(),0,packet.getLength());
-                	diStream = new DataInputStream(biStream);
-                	result = diStream.readUTF(); 
-                }catch (IOException e){ System.out.println("errore nella traduzione dal RS");e.printStackTrace();System.exit(-9);}
+            try{
+                biStream = new ByteArrayInputStream( packet.getData(),0,packet.getLength());
+                diStream = new DataInputStream(biStream);
+                result = diStream.readUTF(); 
+            }catch (IOException e){ System.out.println("errore nella traduzione dal RS");e.printStackTrace();System.exit(-9);}
                 
-                switch (result) {
-                case "1":  System.out.println("tutto bene");
-                         break;
-                case "2":  System.out.println("errore 1");
-                         break;
-                case "3":  System.out.println("errore 2");
-                         break;
-                default: System.out.println("You should not read this");
-                         break;
-                }
-            
-        	}
-        	numLinea1=-1; 
-    		numLinea2=-1;
-    		error=false;
+			switch (result) {
+				case "1":
+					System.out.println("tutto bene");
+					break;
+				case "2":
+					System.out.println("errore 1");
+					break;
+				case "3":
+					System.out.println("errore 2");
+					break;
+				default:
+					System.out.println("You should not read this");
+					break;
+			}
         	System.out.print("\\n^D(Unix)/^Z(Win) invio per uscire, altrimenti inserisci i numeri delle righe(con invio tra l'uno e 'altro)");
-        }
+        }	// while
         socket.close();
-	}    
+	}
 }
-	
