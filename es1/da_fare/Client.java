@@ -67,7 +67,7 @@ public class Client {
         	System.out.println("Porta ricevuta: " + port);
         }catch (IOException e){ System.out.println("errore nella traduzione dal DS");e.printStackTrace();System.exit(-5);}
         
-        System.out.println("Connessione avvenuta, inserire il numero delle righe:()");
+        System.out.println("Inserire i numeri delle righe da invertire:(separati da invio)");
         while ((numBuf=System.console().readLine())!= null)
         { 
         	
@@ -97,18 +97,18 @@ public class Client {
                 
                 packet.setData(data);
                 socket.send(packet);
-            }catch (IOException e){System.out.println("errore nell'invio al RS");e.printStackTrace();System.exit(-7);}
+            }catch (IOException e){System.out.println("errore nell'invio all'RS");e.printStackTrace();System.exit(-7);}
                 
             try {
                 packet.setData(buf);
                 socket.receive(packet);
-            }catch(IOException e) {System.out.println("errore nella ricevuta dal RS");e.printStackTrace();System.exit(-8);}
+            }catch(IOException e) {System.out.println("errore nella ricevuta dall'RS");e.printStackTrace();System.exit(-8);}
                 
             try{
                 biStream = new ByteArrayInputStream( packet.getData(),0,packet.getLength());
                 diStream = new DataInputStream(biStream);
                 result = diStream.readInt(); 
-            }catch (IOException e){ System.out.println("errore nella traduzione dal RS");e.printStackTrace();System.exit(-9);}
+            }catch (IOException e){ System.out.println("errore nella traduzione dall'RS");e.printStackTrace();System.exit(-9);}
                 
 			switch (result) {
 				case 1:
