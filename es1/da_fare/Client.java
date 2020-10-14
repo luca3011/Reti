@@ -114,17 +114,14 @@ public class Client {
 				case 1:
 					System.out.println("tutto bene");
 					break;
-				case 2:
-					System.out.println("errore 1");
-					break;
-				case 3:
-					System.out.println("errore 2");
+				case -1:
+					System.out.println("errore nello scambio delle righe");
 					break;
 				default:
 					System.out.println("You should not read this");
 					break;
 			}
-        	System.out.print("\\n^D(Unix)/^Z(Win) invio per uscire, altrimenti inserisci i numeri delle righe(con invio tra l'uno e 'altro)");
+        	System.out.print("\\n^D(Unix)/^Z(Win) invio per uscire, altrimenti inserisci i numeri delle righe (separati da invio)");
         }	// while
         socket.close();
 	}
