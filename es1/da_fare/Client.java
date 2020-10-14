@@ -29,13 +29,8 @@ public class Client {
 		try {
 			if (args.length == 3)
 			{
-<<<<<<< HEAD
 				addr = InetAddress.getByName(args[0]);
 				port = Integer.parseInt(args[1]);
-=======
-				addr = InetAddress.getByName (args[0]);
-				port = Integer.parseInt (args[1]);
->>>>>>> 84c9de46fbac7bf3d02399b38d1fa333c072705e
 				fileName=args[2];
 			}
 		}catch(UnknownHostException e) {System.out.println("errore con gli argomenti");e.printStackTrace();System.exit(-1);}
@@ -83,23 +78,13 @@ public class Client {
         	}catch (Exception e) {
         		System.out.println("Problemi nell'interazione da console: ");
         		e.printStackTrace();
-<<<<<<< HEAD
 				continue;}
-=======
-				continue;
-			}
->>>>>>> 84c9de46fbac7bf3d02399b38d1fa333c072705e
         	
         	try {
                 socket = new DatagramSocket();
         		socket.setSoTimeout(30000);
         		packet = new DatagramPacket(buf, buf.length, addr, port);
-<<<<<<< HEAD
         	}catch (SocketException e) {System.out.println("errore con il datagram2");e.printStackTrace();System.exit(-6);}
-=======
-        	} 
-            catch (SocketException e) {System.out.println("errore con il datagram2");e.printStackTrace();System.exit(-6);}
->>>>>>> 84c9de46fbac7bf3d02399b38d1fa333c072705e
                 
            	try {
                 boStream = new ByteArrayOutputStream();
@@ -112,11 +97,7 @@ public class Client {
             }catch (IOException e){System.out.println("errore nell'invio al RS");e.printStackTrace();System.exit(-7);}
                 
             try {
-<<<<<<< HEAD
                 packet.setData(buf);s
-=======
-                packet.setData(buf);
->>>>>>> 84c9de46fbac7bf3d02399b38d1fa333c072705e
                 socket.receive(packet);
             }catch(IOException e) {System.out.println("errore nella ricevuta dal RS");e.printStackTrace();System.exit(-8);}
                 
@@ -130,16 +111,8 @@ public class Client {
 				case 1:
 					System.out.println("tutto bene");
 					break;
-<<<<<<< HEAD
 				case -1:
 					System.out.println("errore nella scrittura su file");
-=======
-				case 2:
-					System.out.println("errore 1");
-					break;
-				case 3:
-					System.out.println("errore 2");
->>>>>>> 84c9de46fbac7bf3d02399b38d1fa333c072705e
 					break;
 				default:
 					System.out.println("You should not read this");
