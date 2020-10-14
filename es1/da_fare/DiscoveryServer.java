@@ -37,8 +37,8 @@ public class DiscoveryServer {
                 System.out.println("Errore: inserita una o più porte duplicate");
                 System.exit(3);
             }
-            RowSwap rowSwap = new RowSwap(rowSwapPort, args[i]);
-            portMap.put(args[i], rowSwapPort);
+            RowSwap rowSwap = new RowSwap(rowSwapPort, filename, i);
+            portMap.put(filename, rowSwapPort);
             rowSwap.start();
             System.out.println("Coppia: file " + filename + " porta " + rowSwapPort);
         }

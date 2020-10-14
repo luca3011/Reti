@@ -15,7 +15,8 @@ public class Client {
     {
 		InetAddress addr=null;
 		int port=-1, numLinea1=-1, numLinea2=-1;
-		String fileName=null, richiesta=null, numBuf=null, result=null; 
+		String fileName = null, richiesta = null, numBuf = null;
+		int result = -1; 
 		byte[] buf=new byte[256];
 		
 		DatagramSocket socket=null;
@@ -106,17 +107,17 @@ public class Client {
             try{
                 biStream = new ByteArrayInputStream( packet.getData(),0,packet.getLength());
                 diStream = new DataInputStream(biStream);
-                result = diStream.readUTF(); 
+                result = diStream.readInt(); 
             }catch (IOException e){ System.out.println("errore nella traduzione dal RS");e.printStackTrace();System.exit(-9);}
                 
 			switch (result) {
-				case "1":
+				case 1:
 					System.out.println("tutto bene");
 					break;
-				case "2":
+				case 2:
 					System.out.println("errore 1");
 					break;
-				case "3":
+				case 3:
 					System.out.println("errore 2");
 					break;
 				default:

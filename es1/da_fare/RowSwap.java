@@ -4,13 +4,15 @@ import java.util.StringTokenizer;
 
 public class RowSwap extends Thread {
     
-	int port;
-	static String nomeFile;
+	private int port;
+	private String nomeFile;
+	private int id;
 	
-    public RowSwap(int porta, String nomefile)
+    public RowSwap(int porta, String nomefile, int id)
     {
     	this.port=porta;
-    	RowSwap.nomeFile=nomefile;
+		this.nomeFile = nomefile;
+		this.id = id;
     }
 
     public void run()
@@ -34,7 +36,7 @@ public class RowSwap extends Thread {
 			try 
     		{ 
     			packet.setData(buf); 
-    			socket.receive(packet); 
+				socket.receive(packet);
     		}
     		catch(IOException e){}
 
@@ -45,11 +47,13 @@ public class RowSwap extends Thread {
     			richiesta = diStream.readUTF();
     			StringTokenizer st = new StringTokenizer(richiesta);
     			primaLinea = Integer.parseInt(st.nextToken());
-    			secondaLinea = Integer.parseInt(st.nextToken());
+				secondaLinea = Integer.parseInt(st.nextToken());
+				System.out.println("RowSwap" + id + ": ricevute linee " + primaLinea + " e " + secondaLinea
+							+ " file " + nomeFile);
     		}
     		catch(IOException e) {};
     		
-    		int result = ScambiaLinea(nomeFile, primaLinea, secondaLinea);
+    		int result = ScambiaLinea(primaLinea, secondaLinea);
     		
     		try
     		{
@@ -66,7 +70,7 @@ public class RowSwap extends Thread {
   
     }
 
-	static int ScambiaLinea(String nomeFile2, int primaLinea, int secondaLinea) {
+	private int ScambiaLinea(int primaLinea, int secondaLinea) {
 		
 		String linea;
 		String primaStringa = null;
@@ -80,15 +84,15 @@ public class RowSwap extends Thread {
 		}
 		
 		try {
-			primaStringa = getLine(nomeFile2,primaLinea);
-			secondaStringa = getLine(nomeFile2,primaLinea);
+			primaStringa = getLine(primaLinea);
+			secondaStringa = getLine(primaLinea);
 		} catch (IOException e) {e.printStackTrace(); return -1;}
 		
 		try 
 		{
 			BufferedWriter fileNuovo = new BufferedWriter(new FileWriter(nomeFile+"modificato")); 
 			BufferedReader fileVecchio = new BufferedReader(new FileReader(nomeFile));
-			while((linea = fileVecchio.readLine()) == null)
+			while((linea = fileVecchio.readLine()) != null)
 			{
 				if(linea.equals(primaStringa))
 				{
@@ -119,7 +123,7 @@ public class RowSwap extends Thread {
 		return 1;
 	}
 	
-	static String getLine(String nomeFile, int numLinea) throws IOException
+	private String getLine(int numLinea) throws IOException
 	{ 
 		String linea = null;
 		BufferedReader in = null;
