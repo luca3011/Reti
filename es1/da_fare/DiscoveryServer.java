@@ -35,9 +35,13 @@ public class DiscoveryServer {
             int rowSwapPort = Integer.parseInt(args[i + 1]);
             if (portMap.containsValue(rowSwapPort)) {
                 System.out.println("Errore: inserita una o più porte duplicate");
-                System.exit(3);
+                System.exit(1);
             }
-            RowSwap rowSwap = new RowSwap(rowSwapPort, filename, i);
+            if (portMap.containsKey(filename)) {
+                System.out.println("Errore: inserito file duplicato");
+                System.exit(1);
+            }
+            RowSwap rowSwap = new RowSwap(rowSwapPort, filename);
             portMap.put(filename, rowSwapPort);
             rowSwap.start();
             System.out.println("Coppia: file " + filename + " porta " + rowSwapPort);
@@ -71,6 +75,7 @@ public class DiscoveryServer {
                     biStream = new ByteArrayInputStream(packet.getData(), 0, packet.getLength());
                     diStream = new DataInputStream(biStream);
                     richiesta = diStream.readUTF();
+                    System.out.println("File richiesto: " + richiesta);
                 } catch (Exception e) {
                     e.printStackTrace();
                     continue;
@@ -78,11 +83,12 @@ public class DiscoveryServer {
                 try{
                     boStream = new ByteArrayOutputStream();
                     doStream = new DataOutputStream(boStream);
-                    portaRisposta = (Integer)portMap.get(richiesta); //attenzione: può restituire null
+                    portaRisposta = portMap.get(richiesta); //attenzione: può restituire null
                     if (portaRisposta == null) {
                         System.out.println("Errore: file richiesto non disponibile");
-                        System.exit(5);
+                        System.exit(1);
                     }
+                    System.out.println("OK: File richiesto disponibile sulla porta " + portaRisposta);
                     doStream.writeUTF(portaRisposta.toString());
                     data = boStream.toByteArray();
                     packet.setData(data);

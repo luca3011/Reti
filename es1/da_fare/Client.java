@@ -122,7 +122,8 @@ public class Client {
 					break;
 			}
         	System.out.print("\\n^D(Unix)/^Z(Win) invio per uscire, altrimenti inserisci i numeri delle righe (separati da invio)");
-        }	// while
+		} // while
+		System.out.println("Client: termino...");
         socket.close();
 	}
 }

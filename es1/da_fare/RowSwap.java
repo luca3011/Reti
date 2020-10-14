@@ -6,13 +6,11 @@ public class RowSwap extends Thread {
     
 	private int port;
 	private String nomeFile;
-	private int id;
 	
-    public RowSwap(int porta, String nomefile, int id)
+    public RowSwap(int porta, String nomefile)
     {
     	this.port=porta;
 		this.nomeFile = nomefile;
-		this.id = id;
     }
 
     public void run()
@@ -49,7 +47,7 @@ public class RowSwap extends Thread {
 					StringTokenizer st = new StringTokenizer(richiesta);
 					primaLinea = Integer.parseInt(st.nextToken());
 					secondaLinea = Integer.parseInt(st.nextToken());
-					System.out.println("RowSwap" + id + ": ricevute linee " + primaLinea + " e " + secondaLinea
+					System.out.println("RowSwap (id:" + this.getId() + "): ricevute linee " + primaLinea + " e " + secondaLinea
 								+ " file " + nomeFile);
 				}
 				catch(IOException e) {
