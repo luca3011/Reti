@@ -100,7 +100,6 @@ public class RowSwap extends Thread {
 			BufferedReader fileVecchio = new BufferedReader(new FileReader(nomeFile));
 			while((linea = fileVecchio.readLine()) != null)
 			{
-				System.out.println("Linea letta: " + linea + ", primaStringa = " + primaStringa + ", secondaStringa = "+ secondaStringa);
 				if(linea.equals(primaStringa))
 				{
 					fileNuovo.write(secondaStringa + "\n");
