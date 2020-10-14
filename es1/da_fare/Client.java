@@ -97,7 +97,7 @@ public class Client {
             }catch (IOException e){System.out.println("errore nell'invio al RS");e.printStackTrace();System.exit(-7);}
                 
             try {
-                packet.setData(buf);s
+                packet.setData(buf);
                 socket.receive(packet);
             }catch(IOException e) {System.out.println("errore nella ricevuta dal RS");e.printStackTrace();System.exit(-8);}
                 
