@@ -75,10 +75,7 @@ public class Client {
 				numLinea1 = Integer.parseInt(numBuf);		//lettura numeri righe da console
         		numLinea2 = Integer.parseInt(System.console().readLine());
         		richiesta = numLinea1+" "+numLinea2;
-        	}catch (Exception e) {
-        		System.out.println("Problemi nell'interazione da console: ");
-        		e.printStackTrace();
-				continue;}
+        	}catch (Exception e) {System.out.println("Problemi nell'interazione da console: ");e.printStackTrace();continue;}
         	
         	try {
                 socket = new DatagramSocket();
