@@ -20,54 +20,60 @@ public class RowSwap extends Thread {
     	byte[] buf = new byte[256];
     	DatagramSocket socket = null; DatagramPacket packet = null;
     	
-    	try 
-    	{
+    	try {
 			socket = new DatagramSocket(port);
 			packet = new DatagramPacket(buf,buf.length);
 		} 
-    	catch (SocketException e) {e.printStackTrace();}
-    	
-    	while(true)
-    	{
-    		String richiesta = null;
-    		int primaLinea = 0;
-    		int secondaLinea = 0;
-    		
-			try 
-    		{ 
-    			packet.setData(buf); 
-				socket.receive(packet);
-    		}
-    		catch(IOException e){}
+		catch (SocketException e) {
+			e.printStackTrace();
+		}
+		
+		try{
+			while(true){
+				String richiesta = null;
+				int primaLinea = 0;
+				int secondaLinea = 0;
+				
+				try 
+				{ 
+					packet.setData(buf); 
+					socket.receive(packet);
+				}
+				catch(IOException e){e.printStackTrace();}
 
-    		try
-    		{
-    			ByteArrayInputStream biStream = new ByteArrayInputStream(packet.getData(),0,packet.getLength());
-    			DataInputStream diStream = new DataInputStream(biStream);
-    			richiesta = diStream.readUTF();
-    			StringTokenizer st = new StringTokenizer(richiesta);
-    			primaLinea = Integer.parseInt(st.nextToken());
-				secondaLinea = Integer.parseInt(st.nextToken());
-				System.out.println("RowSwap" + id + ": ricevute linee " + primaLinea + " e " + secondaLinea
-							+ " file " + nomeFile);
-    		}
-    		catch(IOException e) {};
-    		
-    		int result = ScambiaLinea(primaLinea, secondaLinea);
-    		
-    		try
-    		{
-    			ByteArrayOutputStream boStream = new ByteArrayOutputStream();
-    			DataOutputStream doStream = new DataOutputStream(boStream);
-    			doStream.writeInt(result);
-    			byte[] data = boStream.toByteArray();
-    			packet.setData(data); socket.send(packet);
-    		}
-    		catch(IOException e) {};
-    		
-    		socket.close();
-    	}
-  
+				try
+				{
+					ByteArrayInputStream biStream = new ByteArrayInputStream(packet.getData(),0,packet.getLength());
+					DataInputStream diStream = new DataInputStream(biStream);
+					richiesta = diStream.readUTF();
+					StringTokenizer st = new StringTokenizer(richiesta);
+					primaLinea = Integer.parseInt(st.nextToken());
+					secondaLinea = Integer.parseInt(st.nextToken());
+					System.out.println("RowSwap" + id + ": ricevute linee " + primaLinea + " e " + secondaLinea
+								+ " file " + nomeFile);
+				}
+				catch(IOException e) {
+					e.printStackTrace();};
+				
+				int result = ScambiaLinea(primaLinea, secondaLinea);
+				
+				try
+				{
+					ByteArrayOutputStream boStream = new ByteArrayOutputStream();
+					DataOutputStream doStream = new DataOutputStream(boStream);
+					doStream.writeInt(result);
+					byte[] data = boStream.toByteArray();
+					packet.setData(data); socket.send(packet);
+				}
+				catch(IOException e) {
+					e.printStackTrace();};
+				
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		socket.close();
     }
 
 	private int ScambiaLinea(int primaLinea, int secondaLinea) {
