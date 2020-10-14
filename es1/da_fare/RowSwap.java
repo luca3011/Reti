@@ -91,7 +91,7 @@ public class RowSwap extends Thread {
 		
 		try {
 			primaStringa = getLine(primaLinea);
-			secondaStringa = getLine(primaLinea);
+			secondaStringa = getLine(secondaLinea);
 		} catch (IOException e) {e.printStackTrace(); return -1;}
 		
 		try 
@@ -100,17 +100,18 @@ public class RowSwap extends Thread {
 			BufferedReader fileVecchio = new BufferedReader(new FileReader(nomeFile));
 			while((linea = fileVecchio.readLine()) != null)
 			{
+				System.out.println("Linea letta: " + linea + ", primaStringa = " + primaStringa + ", secondaStringa = "+ secondaStringa);
 				if(linea.equals(primaStringa))
 				{
-					fileNuovo.write(secondaStringa);
+					fileNuovo.write(secondaStringa + "\n");
 				}
 				else if(linea.equals(secondaStringa))
 				{
-					fileNuovo.write(primaStringa);
+					fileNuovo.write(primaStringa + "\n");
 				}
 				else
 				{
-					fileNuovo.write(linea);
+					fileNuovo.write(linea + "\n");
 				}
 			}
 			
