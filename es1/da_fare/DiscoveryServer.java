@@ -90,9 +90,11 @@ public class DiscoveryServer {
                     continue;
                 }
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
+        System.out.println("DiscoveryServer: termino...");
+        socket.close();
     }
     
 }
