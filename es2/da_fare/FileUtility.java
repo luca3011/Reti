@@ -7,22 +7,16 @@ public class FileUtility {
 
     static protected void trasferisci_a_byte_file_binario(DataInputStream src, DataOutputStream dest)
             throws IOException {
-        trasferisci_a_byte_file_binario(src, dest, -1);
+        trasferisci_a_byte_file_binario(src, dest, Long.MAX_VALUE);
     }
     
-    static protected void trasferisci_a_byte_file_binario(DataInputStream src, DataOutputStream dest, int length)
+    static protected void trasferisci_a_byte_file_binario(DataInputStream src, DataOutputStream dest, long length)
             throws IOException {
         // ciclo di lettura da sorgente e scrittura su destinazione
         int buffer = 0;
         try { // esco dal ciclo alla lettura di un valore negativo-> EOF oppure in seguito alla lettura di length caratteri
-            if (length >= 0) {
-                for (int i = 0; i < length && (buffer = src.read()) >= 0; i++)
-                    dest.write(buffer);
-            }
-            else {
-                while ((buffer = src.read()) >= 0)
-                    dest.write(buffer);
-            }
+            for (long i = 0; i < length && (buffer = src.read()) >= 0; i++)
+                dest.write(buffer);
             
             dest.flush();
         } catch (EOFException e) {

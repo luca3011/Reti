@@ -1,9 +1,11 @@
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 
 public class ServerThread extends Thread {
@@ -26,29 +28,38 @@ public class ServerThread extends Thread {
                 e.printStackTrace();
                 return;
             }
-            try{
-                while ((nomeFile = inSock.readUTF()) != null) { //TODO: verificare funzionamento (= che effettivamente si fermi solo alla chiusura dell'output da parte del client)
+            FileOutputStream outFile = null;
+            try {
+                while (true) { //per verificare la chiusura della connessione si gestisce la EOFException (probabilmente possibili altre soluzioni)
+                    nomeFile = inSock.readUTF();
                     String risposta = null;
-                    int length;
+                    long length;
                     File file = new File(nomeFile);
-                    FileOutputStream outFile = null;
                     if (file.createNewFile()) {
                         // restituisce true se un file con quel nome non era esistente ed è stato creato, 
                         // false se era esistente. Si noti che il metodo verifica e crea un file in modo atomico 
-                        // ---> non c'è necessità di gestire conflitti tra i vari thread
-                        outSock.writeUTF("attiva");
-                        length = inSock.readInt();
-                        outFile = new FileOutputStream(nomeFile);
-                        FileUtility.trasferisci_a_byte_file_binario(inSock, new DataOutputStream(outFile), length);
+                        // ---> non c'è necessità di gestire conflitti tra i vari thread (?)
+                        try {
+                            outSock.writeUTF("attiva");
+                            length = inSock.readLong();
+                            outFile = new FileOutputStream(nomeFile);
+                            FileUtility.trasferisci_a_byte_file_binario(inSock, new DataOutputStream(outFile), length);
+                        } catch (SocketTimeoutException te) {
+                            te.printStackTrace();
+                            outFile.close();
+                        }
                     } else {
                         outSock.writeUTF("salta");
                     }
                 }
-            
+
+            } catch (EOFException eofe) {   //lanciata da readUTF, segnala la chiusura della connessione da parte del client
+                System.out.println(
+                        "[OK] ServerThread n. " + this.getId() + ": connessione chiusa dal client. Termino...");
                 clientSocket.close();
-            } catch (SocketTimeoutException te) {
-                te.printStackTrace();
-            } catch (IOException e) {
+                System.exit(0);
+            } catch (SocketException e) {
+                outFile.close();
                 e.printStackTrace();
             }
         } catch (Exception e) {

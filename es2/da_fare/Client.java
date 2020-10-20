@@ -25,7 +25,7 @@ public class Client {
             } 
             else
             { 
-                System.out.println("Usage: PutFileClient addr port"); 
+                System.out.println("Usage: Client addr port"); 
                 System.exit(1); 
             }
         }catch(Exception e){e.printStackTrace();}
@@ -64,27 +64,27 @@ public class Client {
         
 
 		try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {
-		    for (Path file: stream) {
-		    	   	
-		    	if(file.toFile().length()>soglia)
-		    	{	
-		    		System.out.println(file.getFileName());  //fai roba
-		    		
-		    		outSock.writeUTF(file.getFileName().toString());
-		    		esito = inSock.readUTF();
-		    		
-		    		if(esito.contentEquals("attiva"))
-		    		{
-		    			outSock.writeLong(file.toFile().length());
-		    			inFile = new FileInputStream(file.toFile());
-		    			FileUtility.trasferisci_a_byte_file_binario(new DataInputStream(inFile), outSock);
-		    		}
+            for (Path file : stream) {
+                
+                if (Files.isRegularFile(file) && file.toFile().length() > soglia) {
+                    System.out.println(file.getFileName()); //fai roba
 
-		    	}	 		
-		    }
+                    outSock.writeUTF(file.getFileName().toString());
+                    esito = inSock.readUTF();
+
+                    if (esito.contentEquals("attiva")) {
+                        outSock.writeLong(file.toFile().length());
+                        inFile = new FileInputStream(file.toFile());
+                        FileUtility.trasferisci_a_byte_file_binario(new DataInputStream(inFile), outSock);
+                    }
+
+                }
+
+            }
+
 		    socket.close();
 		    
-		} catch (IOException e) {e.printStackTrace();;}
+		} catch (IOException e) {e.printStackTrace();}
 		
 		
 		  
