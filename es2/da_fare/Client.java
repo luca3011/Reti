@@ -67,7 +67,7 @@ public class Client {
             for (Path file : stream) {
 
                 if (Files.isRegularFile(file) && file.toFile().length() > soglia) {
-                    System.out.println("nomefile: " + file.getFileName()); //fai roba
+                    System.out.println("nomefile: " + file.getFileName());
 
                     outSock.writeUTF(file.getFileName().toString());
                     esito = inSock.readUTF();
@@ -91,8 +91,6 @@ public class Client {
 		    
 		} catch (IOException e) {e.printStackTrace();}
 		
-		
-		  
 	}
 		
 	
