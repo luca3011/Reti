@@ -29,18 +29,19 @@ public class Client {
 		try {
 			if (args.length == 3)
 			{
-				addr = InetAddress.getByName(args[0]);
-				port = Integer.parseInt(args[1]);
+				addr = InetAddress.getByName (args[0]);
+				port = Integer.parseInt (args[1]);
 				fileName=args[2];
 			}
-		}catch(UnknownHostException e) {System.out.println("errore con gli argomenti");e.printStackTrace();System.exit(-1);}
+		}catch(UnknownHostException e) { System.out.println("errore con gli argomenti");e.printStackTrace();System.exit(-1);}
 		
         try 
         {
         	socket = new DatagramSocket();
 			socket.setSoTimeout(30000);
 			packet = new DatagramPacket(buf, buf.length, addr, port);
-		}catch (SocketException e) {System.out.println("errore con il datagram");e.printStackTrace();System.exit(-2);}
+		} 
+        catch (SocketException e) {System.out.println("errore con il datagram");e.printStackTrace();System.exit(-2);}
         
         richiesta=fileName;
         
@@ -66,22 +67,27 @@ public class Client {
         	System.out.println("Porta ricevuta: " + port);
         }catch (IOException e){ System.out.println("errore nella traduzione dal DS");e.printStackTrace();System.exit(-5);}
         
-        System.out.println("Connessione avvenuta, inserire il numero delle righe:");
-		
-		while ((numBuf=System.console().readLine())!= null)
+        System.out.println("Inserire i numeri delle righe da invertire:(separati da invio)");
+        while ((numBuf=System.console().readLine())!= null)
         { 
+        	
         	try
 			{
 				numLinea1 = Integer.parseInt(numBuf);		//lettura numeri righe da console
         		numLinea2 = Integer.parseInt(System.console().readLine());
         		richiesta = numLinea1+" "+numLinea2;
-        	}catch (Exception e) {System.out.println("Problemi nell'interazione da console: ");e.printStackTrace();continue;}
+        	}catch (Exception e) {
+        		System.out.println("Problemi nell'interazione da console: ");
+        		e.printStackTrace();
+				continue;
+			}
         	
         	try {
                 socket = new DatagramSocket();
         		socket.setSoTimeout(30000);
         		packet = new DatagramPacket(buf, buf.length, addr, port);
-        	}catch (SocketException e) {System.out.println("errore con il datagram2");e.printStackTrace();System.exit(-6);}
+        	} 
+            catch (SocketException e) {System.out.println("errore con il datagram2");e.printStackTrace();System.exit(-6);}
                 
            	try {
                 boStream = new ByteArrayOutputStream();
@@ -91,32 +97,33 @@ public class Client {
                 
                 packet.setData(data);
                 socket.send(packet);
-            }catch (IOException e){System.out.println("errore nell'invio al RS");e.printStackTrace();System.exit(-7);}
+            }catch (IOException e){System.out.println("errore nell'invio all'RS");e.printStackTrace();System.exit(-7);}
                 
             try {
                 packet.setData(buf);
                 socket.receive(packet);
-            }catch(IOException e) {System.out.println("errore nella ricevuta dal RS");e.printStackTrace();System.exit(-8);}
+            }catch(IOException e) {System.out.println("errore nella ricevuta dall'RS");e.printStackTrace();System.exit(-8);}
                 
             try{
                 biStream = new ByteArrayInputStream( packet.getData(),0,packet.getLength());
                 diStream = new DataInputStream(biStream);
                 result = diStream.readInt(); 
-            }catch (IOException e){ System.out.println("errore nella traduzione dal RS");e.printStackTrace();System.exit(-9);}
+            }catch (IOException e){ System.out.println("errore nella traduzione dall'RS");e.printStackTrace();System.exit(-9);}
                 
 			switch (result) {
 				case 1:
 					System.out.println("tutto bene");
 					break;
 				case -1:
-					System.out.println("errore nella scrittura su file");
+					System.out.println("errore nello scambio delle righe");
 					break;
 				default:
 					System.out.println("You should not read this");
 					break;
 			}
-        	System.out.print("\\n^D(Unix)/^Z(Win) invio per uscire, altrimenti inserisci i numeri delle righe(con invio tra l'uno e 'altro)");
-        }	// while
+        	System.out.print("\\n^D(Unix)/^Z(Win) invio per uscire, altrimenti inserisci i numeri delle righe (separati da invio)");
+		} // while
+		System.out.println("Client: termino...");
         socket.close();
 	}
 }
