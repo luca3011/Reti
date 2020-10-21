@@ -65,7 +65,7 @@ public class Client {
 
 		try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {
             for (Path file : stream) {
-                
+
                 if (Files.isRegularFile(file) && file.toFile().length() > soglia) {
                     System.out.println("nomefile: " + file.getFileName()); //fai roba
 
@@ -73,10 +73,11 @@ public class Client {
                     esito = inSock.readUTF();
 
                     if (esito.contentEquals("attiva")) {
-                        outSock.writeLong(file.toFile().length());
+                        long fileLength = file.toFile().length();
+                        outSock.writeLong(fileLength);
                         inFile = new FileInputStream(file.toFile());
                         long start = System.currentTimeMillis();
-                        FileUtility.trasferisci_a_byte_file_binario(new DataInputStream(inFile), outSock);
+                        FileUtility.trasferisci_a_byte_file_binario(new DataInputStream(inFile), outSock, fileLength);
                         System.out.println(
                                 "tempo di trasferimento: " + (System.currentTimeMillis() - start) + " millisecondi");
                     }
@@ -85,6 +86,7 @@ public class Client {
 
             }
 
+            System.out.println("Client: termino...");
 		    socket.close();
 		    
 		} catch (IOException e) {e.printStackTrace();}

@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 
 public class ServerThread extends Thread {
     
@@ -21,7 +23,7 @@ public class ServerThread extends Thread {
         DataOutputStream outSock = null;
         String nomeFile = null;
         try {
-            try{
+            try {
                 inSock = new DataInputStream(clientSocket.getInputStream());
                 outSock = new DataOutputStream(clientSocket.getOutputStream());
             } catch (IOException e) {
@@ -37,16 +39,20 @@ public class ServerThread extends Thread {
                     if (nomeFile != null && nomeFile != "") {
                         File file = new File(nomeFile);
                         System.out.println("nomefile: " + nomeFile);
-                        if (file.createNewFile()) {
-                            // restituisce true se un file con quel nome non era esistente ed è stato creato, 
-                            // false se era esistente. Si noti che il metodo verifica e crea un file in modo atomico 
-                            // ---> non c'è necessità di gestire conflitti tra i vari thread (?)
+                        if (!file.exists()) {
+
                             try {
+                                outFile = new FileOutputStream(nomeFile);
+                                FileChannel channel = outFile.getChannel();
+                                FileLock lock = channel.lock();
                                 outSock.writeUTF("attiva");
                                 length = inSock.readLong();
-                                outFile = new FileOutputStream(nomeFile);
+                                
                                 FileUtility.trasferisci_a_byte_file_binario(inSock, new DataOutputStream(outFile),
                                         length);
+
+                                lock.release();
+                                channel.close();
                             } catch (SocketTimeoutException te) {
                                 te.printStackTrace();
                                 outFile.close();
@@ -57,13 +63,17 @@ public class ServerThread extends Thread {
                     }
                 }
 
-            } catch (EOFException eofe) {   //lanciata da readUTF, segnala la chiusura della connessione da parte del client
+            } catch (EOFException eofe) { //lanciata da readUTF, segnala la chiusura della connessione da parte del client
+                if(outFile != null)
+                    outFile.close();
+
                 System.out.println(
-                        "[OK] ServerThread n. " + this.getId() + ": connessione chiusa dal client. Termino...");
+                        "[OK] ServerThread n. " + this.getId() + ": connessione chiusa dal client.");
                 clientSocket.close();
-                System.exit(0);
             } catch (SocketException e) {
-                outFile.close();
+                if(outFile != null)   
+                    outFile.close();
+
                 e.printStackTrace();
             }
         } catch (Exception e) {
@@ -72,4 +82,5 @@ public class ServerThread extends Thread {
         }
 
     }
+    
 }
