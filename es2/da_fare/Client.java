@@ -37,10 +37,10 @@ public class Client {
 		
         try 
         {
-        	System.out.println("Inserisci soglia in bytes");
-        	System.out.println("Inserisci path");
-        	dir = Paths.get(in.readLine());
-			soglia = Integer.parseInt(in.readLine());
+        	System.out.println("Inserisci path della directory:");
+            dir = Paths.get(in.readLine());
+            System.out.println("Inserisci soglia minima in bytes:");
+            soglia = Integer.parseInt(in.readLine());
 		} 
         catch (NumberFormatException | IOException e1) {e1.printStackTrace();}
         
@@ -67,7 +67,7 @@ public class Client {
             for (Path file : stream) {
                 
                 if (Files.isRegularFile(file) && file.toFile().length() > soglia) {
-                    System.out.println(file.getFileName()); //fai roba
+                    System.out.println("nomefile: " + file.getFileName()); //fai roba
 
                     outSock.writeUTF(file.getFileName().toString());
                     esito = inSock.readUTF();
@@ -75,7 +75,10 @@ public class Client {
                     if (esito.contentEquals("attiva")) {
                         outSock.writeLong(file.toFile().length());
                         inFile = new FileInputStream(file.toFile());
+                        long start = System.currentTimeMillis();
                         FileUtility.trasferisci_a_byte_file_binario(new DataInputStream(inFile), outSock);
+                        System.out.println(
+                                "tempo di trasferimento: " + (System.currentTimeMillis() - start) + " millisecondi");
                     }
 
                 }

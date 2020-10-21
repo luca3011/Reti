@@ -34,22 +34,26 @@ public class ServerThread extends Thread {
                     nomeFile = inSock.readUTF();
                     String risposta = null;
                     long length;
-                    File file = new File(nomeFile);
-                    if (file.createNewFile()) {
-                        // restituisce true se un file con quel nome non era esistente ed è stato creato, 
-                        // false se era esistente. Si noti che il metodo verifica e crea un file in modo atomico 
-                        // ---> non c'è necessità di gestire conflitti tra i vari thread (?)
-                        try {
-                            outSock.writeUTF("attiva");
-                            length = inSock.readLong();
-                            outFile = new FileOutputStream(nomeFile);
-                            FileUtility.trasferisci_a_byte_file_binario(inSock, new DataOutputStream(outFile), length);
-                        } catch (SocketTimeoutException te) {
-                            te.printStackTrace();
-                            outFile.close();
+                    if (nomeFile != null && nomeFile != "") {
+                        File file = new File(nomeFile);
+                        System.out.println("nomefile: " + nomeFile);
+                        if (file.createNewFile()) {
+                            // restituisce true se un file con quel nome non era esistente ed è stato creato, 
+                            // false se era esistente. Si noti che il metodo verifica e crea un file in modo atomico 
+                            // ---> non c'è necessità di gestire conflitti tra i vari thread (?)
+                            try {
+                                outSock.writeUTF("attiva");
+                                length = inSock.readLong();
+                                outFile = new FileOutputStream(nomeFile);
+                                FileUtility.trasferisci_a_byte_file_binario(inSock, new DataOutputStream(outFile),
+                                        length);
+                            } catch (SocketTimeoutException te) {
+                                te.printStackTrace();
+                                outFile.close();
+                            }
+                        } else {
+                            outSock.writeUTF("salta");
                         }
-                    } else {
-                        outSock.writeUTF("salta");
                     }
                 }
 
