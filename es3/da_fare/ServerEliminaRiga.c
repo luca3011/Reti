@@ -103,39 +103,40 @@ int main(int argc, char **argv)
 }
 
 void figlio(int conn_sd){
-    uint16_t numlinea, nread;
+    int numlinea, nread;
     char buffer[DIM_BUFF];
 
-    if(read(conn_sd, &numlinea, sizeof(uint16_t)) <= 0){
+    if(read(conn_sd, &numlinea, sizeof(int)) <= 0){
         printf("[figlio n. %d] socket error (connessione chiusa dal client?)", getpid());
         exit(1);
     }
     //controllo sulla correttezza del numero di linea non necessario
-    numlinea = ntohs(numlinea);
+    numlinea = ntohl(numlinea);
     printf("riga da eliminare: %d\n", numlinea);
+    int riga = 1;
     while((nread = read(conn_sd, buffer, DIM_BUFF)) > 0){
-        int i, riga = 1;
+        int i;
         char *start = buffer;
         char *end = buffer;
         for(i=0;i<nread && riga <= numlinea;i++){
             if(buffer[i] == '\n'){
                 if(riga == numlinea){
-                    write(1, buffer, end-buffer);
-                    write(conn_sd, buffer, end-buffer);
-                    start = buffer+i;
+                    //write(1, buffer, (end-buffer));
+                    write(conn_sd, buffer, (end-buffer));
+                    start = buffer+i+1;
                 }
-                end = buffer+i;
+                end = buffer+i+1;
                 riga++;
             }
         }
         //se la riga da cancellare non è l'ultima
         if(i!=nread){
-            write(1, start, nread - (start - buffer));
+            //write(1, start, nread - (start - buffer));
             write(conn_sd, start, nread - (start - buffer));
         }
-        else{
-            write(1, buffer, nread - (end - buffer));
-            write(conn_sd, buffer, nread - (end - buffer));
+        else if(buffer[nread-1] != '\n'){   //se la riga da cancellare è l'ultima
+            //write(1, buffer,(end - buffer)+1);
+            write(conn_sd, buffer, (end - buffer)+1);
         }
     
     }
