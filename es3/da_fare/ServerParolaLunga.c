@@ -7,7 +7,7 @@
 #include <unistd.h>
 #include <string.h>
 
-#define MAX_WORD_LENGTH 200;
+#define MAX_WORD_LENGTH 200
 
 typedef struct{
     char nomefile[20];
@@ -15,7 +15,7 @@ typedef struct{
 
 int main(int argc, char **argv){
     
-    int sd, port, len, num1, num2, ris, max_lenght;
+    int sd, port, len, max_lenght;
     char line[200];
     FILE *file;
     const int on = 1;
