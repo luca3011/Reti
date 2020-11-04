@@ -79,7 +79,7 @@ int main(int argc, char **argv)
             continue;
         }
         strcpy(packet, nome_file);
-        strcat(packet, "/"); //tokenizzo
+        strcat(packet, ";"); //tokenizzo
         strcat(packet, parola);
 
         len = sizeof(servaddr); // Invio richiesta

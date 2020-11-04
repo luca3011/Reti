@@ -13,61 +13,120 @@
 #include <sys/wait.h>
 
 #define DIM_BUFF 4096
+#define DIRNAME_SIZE 64
 
-/*int conta_file(char *name)
-{ // Funzione di conteggio dei file nel direttorio
-    DIR *dir;
-    struct dirent *dd;
-    int count = 0;
-    dir = opendir(name);
-    while ((dd = readdir(dir)) != NULL)
-    {
-        printf("Trovato il file %s\n", dd->d_name);
-        count++;
-    } /* conta anche il direttorio stesso e il padre e altri direttori! 
-printf("Numero totale di file %d\n", count);
-closedir(dir);
-return count;
+void invia_nomi_file(DIR *dir, int connfd){ // Funzione di conteggio dei file nel direttorio
+    struct dirent *subdd;
+    while ((subdd = readdir(dir)) != NULL){
+        //leggo ogni file e lo scrivo (separando ogni nome da ';')
+        if(strcmp(subdd->d_name, ".") != 0 && strcmp(subdd->d_name, "..") != 0){
+            char tmp[65];
+            strcpy(tmp, subdd->d_name);
+            strcat(tmp, ";");
+            write(connfd, tmp, strlen(subdd->d_name)+1);    // bufferizzare la scrittura dei nomi file per eseguire meno system call
+        }
+    } // conta anche il direttorio stesso e il padre e altri direttori! 
 }
-*/
 
-int conta_parola(char *name)
+void scan_subdir(DIR *dir, char *basePath, int connfd){
+    struct dirent *dd;
+    while((dd = readdir(dir)) != NULL){
+        DIR *subdir;
+        char subdir_name[2*DIRNAME_SIZE];
+        if(strcmp(dd->d_name, ".") != 0 && strcmp(dd->d_name, "..") != 0){   //evito di scorrere la dir corrente o quella sovrastante
+            //costruisco il path della sottocartella
+            strcpy(subdir_name, basePath);
+            strcat(subdir_name, "/");
+            strcat(subdir_name, dd->d_name);
+
+            if((subdir = opendir(subdir_name)) != NULL){ // != NULL --> è una directory che posso aprire (e non un file)
+                invia_nomi_file(subdir, connfd);
+                closedir(subdir);
+            }
+        }
+    }
+}
+
+
+int elimina_parola(char *name)
 {
     char *nome_file;
     char *parola;
-    char buff[DIM_BUFF];
-    int count = 0, fd_file, nread, lengpar=0,j=0;
-    nome_file = strtok(name, ";");
+    char buff[DIM_BUFF], goodtxt[DIM_BUFF];
+    int let_trov = 0, k = 0, i = 0;
+    int count = 0, fd_file, nread, lengpar = -1, fd_temp;
+    nome_file = strtok(name, ";"); //libero il token
     parola = strtok(NULL, ";");
 
     if (nome_file == NULL || parola == NULL)
     {
         printf("errore con i dati in input\n");
+        printf("Qualsiasi tasto per procedere, EOF per fine:");
         return -1;
     }
-    printf("ops\n");
     fd_file = open(nome_file, O_RDONLY);
     if (fd_file < 0)
     {
-        printf("N");
+        perror("open file");
+        printf("Qualsiasi tasto per procedere, EOF per fine:");
         return -2;
     }
-    printf("debug\n");
-    printf("%s,%s.\n", nome_file, parola);
 
-    lengpar=strlen(parola);
-    printf("size: %d, lettera: %c\n",lengpar, parola[0]);
-    while ((nread = read(fd_file, buff, sizeof(buff))) > 0){
-        for(int i=0;i<sizeof(buff);i++){
-            if(buff[i]==parola[j])
-                j++;
-            else
-                j=0;
-            if(j==lengpar){
-                count++;j=0;}
-        }
+    lengpar = strlen(parola);
+    printf("size: %d, parola: %s.\n", lengpar, parola);
+    // Creazione file ordinato
+    if ((fd_temp = open("temp.txt", O_CREAT | O_WRONLY | O_TRUNC, 0644)) < 0){
+        perror("open file temp");
+        printf("Qualsiasi tasto per procedere, EOF per fine:");
+        return -3;
     }
+    while ((nread = read(fd_file, buff, sizeof(buff))) > 0){
+        for (i = 0; i < nread; i++){
+            if (buff[i] == parola[let_trov]) //c'è una corrispondenza tra buff e parola
+                let_trov++;
+            else{
+                for (int t = 0; t < let_trov; t++){         //copio la parte di buffer scambiata per buona
+                    goodtxt[k] = buff[(i - let_trov) + t]; //i-let_trov è l'inizio del falso positivo
+                    k++;
+                }
+                let_trov = 0;
+                if (buff[i] == parola[let_trov]) let_trov++; //se la lettera non è valida a seguito delle altre ma è la prima
+                else { goodtxt[k] = buff[i]; k++; }
+            }
+            if (let_trov == lengpar){ //trovata parola completa
+                count++;
+                let_trov = 0;
+            }
+        }
+        if (let_trov > 0){ //fine del file, le ultime lettere potrebbero essere l'inizio della parola
+            for (int t = 0; t < let_trov; t++){
+                goodtxt[k] = buff[(i - let_trov) + t]; //i-let_trov è l'inizio del falso positivo
+                k++;
+            }
+        }
+        if ((nread = write(fd_temp, &goodtxt, (k) * sizeof(char))) < 0)
+        {
+            perror("write\n");
+            printf("Qualsiasi tasto per procedere, EOF per fine:");
+            return -3;
+        }
+        write(1, &goodtxt, (k) * sizeof(char)); //debug
+    }//while
+    close(fd_file);
+    close(fd_temp);
 
+    if (remove(nome_file) != 0)
+    {
+        perror("remove");
+        printf("Qualsiasi tasto per procedere, EOF per fine:");
+        return -3;
+    }
+    if (rename("temp.txt", nome_file) != 0)
+    {
+        perror("rename");
+        printf("Qualsiasi tasto per procedere, EOF per fine:");
+        return -3;
+    }
     return count;
 }
 
@@ -78,15 +137,14 @@ void gestore(int signo) // gestore del segnale per eliminare i processi figli
     wait(&stato);
 }
 
-int max(int a, int b)
-{
+int max(int a, int b){
     return (a > b) ? a : b;
 }
 
 int main(int argc, char **argv)
 {
     int listenfd, connfd, udpfd, fd_file, nready, maxfdp1;
-    char zero = 0, buff[DIM_BUFF], nome_file[20], packet[20];
+    char zero = 0, buff[DIM_BUFF], nome_dir[DIRNAME_SIZE], packet[20];
     const int on = 1;
     fd_set rset;
     int len, nread, nwrite, num, ris, port;
@@ -170,7 +228,7 @@ int main(int argc, char **argv)
                 perror("recvfrom");
                 continue;
             }
-            num = conta_parola(packet);
+            num = elimina_parola(packet);
             ris = htonl(num);
             if (sendto(udpfd, &ris, sizeof(ris), 0, (struct sockaddr *)&cliaddr, len) < 0)
             {
@@ -180,59 +238,43 @@ int main(int argc, char **argv)
         }
         if (FD_ISSET(listenfd, &rset))
         {
-            printf("Ricevuta richiesta di get di un file\n");
+            printf("Ricevuta richiesta da un client directory\n");
             len = sizeof(struct sockaddr_in);
-            if ((connfd = accept(listenfd, (struct sockaddr *)&cliaddr, &len)) < 0)
-            {
+            if ((connfd = accept(listenfd, (struct sockaddr *)&cliaddr, &len)) < 0){
                 if (errno == EINTR)
                     continue;
-                else
-                {
+                else{
                     perror("accept");
                     exit(9);
                 }
             }
-            if (fork() == 0)
-            { /* FIGLIO */
+            if (fork() == 0){ /* FIGLIO */
                 close(listenfd);
                 printf("Dentro il figlio, pid=%i\n", getpid());
-                for (;;)
-                { // Ciclo di gestione richieste con un’unica socket da parte del figlio
-                    if ((nread = read(connfd, &nome_file, sizeof(nome_file))) < 0)
-                    {
+                while((nread = read(connfd, &nome_dir, sizeof(nome_dir))) != 0){ // Ciclo di gestione richieste con un’unica socket da parte del figlio
+                    if (nread < 0){ // in caso di errore notifico il cliente
                         perror("read");
-                        break;
+                        write(connfd, "N", 1);
+                        continue;
                     }
-                    else if (nread == 0)
-                    { // Quando il figlio riceve EOF esce dal ciclo
-                        printf("Ricevuto EOF\n");
-                        break;
-                    }
-                    printf("Richiesto file %s\n", nome_file);
-                    fd_file = open(nome_file, O_RDONLY);
-                    if (fd_file < 0)
-                    {
+                    printf("Richiesta directory %s\n", nome_dir);
+                    DIR *dir = opendir(nome_dir);
+                    if (dir == NULL){
                         write(connfd, "N", 1);
                     }
-                    else
-                    {
-                        write(connfd, "S", 1); // lettura/scrittura file (a blocchi)
-                        while ((nread = read(fd_file, buff, sizeof(buff))) > 0)
-                        {
-                            if (nwrite = write(connfd, buff, nread) < 0)
-                            {
-                                perror("write");
-                                break;
-                            }
-                        }
-                        write(connfd, &zero, 1); // Invio messaggio terminazione file: zero binario
-                        close(fd_file);          // Libero la risorsa sessione file
-                    }                            //else
-                }                                //for
-                close(connfd);
-                exit(0);   //Chiusura della connessione all’uscita dal ciclo
-            }              //figlio
+                    else{
+                        write(connfd, "S", 1);
+                        scan_subdir(dir, nome_dir, connfd); //effettua la scansione delle sottodirectory
+                        closedir(dir);
+                        write(connfd, &zero, 1); // Invio messaggio terminazione sequenza: zero binario
+                    }                            
+                }
+                printf("Ricevuto EOF\n");                               
+                close(connfd);      //Chiusura della connessione all’uscita dal ciclo
+                exit(EXIT_SUCCESS);   
+            } //figlio
+
             close(connfd); // Padre: chiusura socket di comunicazione e suo ciclo
-        }                  //if
-    }                      //for
-} //main
+        }                  
+    }                      
+} 

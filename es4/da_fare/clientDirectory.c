@@ -64,10 +64,33 @@ int main(int argc, char **argv){
         
         if(ok == 'S'){
             // ricevo la lista dei nomi
-            //TODO: stabilire un protocollo
+            short EOS = 0;  // flag per segnalare la fine della sequenza
+            printf("File contenuti nelle sottodirectory:\n");
+            while(!EOS && (nread = read(sd, buff, sizeof(buff))) > 0){
+                int i;
+                char *startptr = buff;
+                for(i=0;i<nread;i++){
+                    if(buff[i] == 0){
+                        EOS = 1;
+                        break;
+                    }
+                    else if(buff[i] == ';'){
+                        char toWrite[DIRNAME_SIZE];
+                        write(1, startptr, (buff+i) - startptr);
+                        printf("\n");
+                        startptr = buff+i+1;
+                    }
+                }
+
+                //scrivo l'ultimo nome file eventualmente rimasto nel buffer
+                if(buff[nread - 1] != ';'){
+                    write(1, startptr, (buff+nread) - startptr);
+                    printf("\n");
+                }
+            }
         }
         else if(ok == 'N'){
-            printf("Errore: directory inesistente\n");
+            printf("Errore del server (directory inesistente?)\n");
         }
         else{
             printf("Errore di protocollo!\n");
