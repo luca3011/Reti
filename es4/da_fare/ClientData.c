@@ -13,12 +13,12 @@ int main(int argc, char **argv)
 {
     struct hostent *host;
     struct sockaddr_in servaddr, clientaddr;
-    int sd, len, num_file;
-    char nome_file[20], parola[40];
+    int sd, len, num_file,result,port;
+    char nome_file[136], parola[80];
     char *packet;
     if (argc != 3)
     { // Controllo argomenti
-        printf("Error:%s server\n", argv[0]);
+        printf("Error:%s, numero di argomenti sbagliato\n", argv[0]);
         exit(1);
     }
 
@@ -36,17 +36,35 @@ int main(int argc, char **argv)
     }
     else
     {
+        int num1 = 0;
+         while( argv[2][num1]!= '\0' )
+        {
+            if ((argv[2][num1] < '0') || (argv[2][num1] > '9'))
+            {   
+                printf("Secondo argomento non intero\n");
+                exit(3);
+            }
+        num1++;
+        }
+        port = atoi(argv[2]);
+         if (port < 1024 || port > 65535)
+        {
+            printf("Port scorretta...");
+            exit(3); 
+        }
+ 
         servaddr.sin_addr.s_addr = ((struct in_addr *)(host->h_addr))->s_addr;
-        servaddr.sin_port = htons(atoi(argv[2]));
+        servaddr.sin_port = htons(port);
     }
+
     sd = socket(AF_INET, SOCK_DGRAM, 0); // Creazione e connessione
     if (sd < 0)
     {
         perror("aperturasocket");
-        exit(3);
+        exit(4);
     }
 
-    bind(sd, (struct sockaddr *)&clientaddr, sizeof(clientaddr)); // Corpo del client: ciclo di accettazione di richieste di conteggio
+    bind(sd, (struct sockaddr *)&clientaddr, sizeof(clientaddr)); // Corpo del client: ciclo di accettazione di richieste di eliminazione
     printf("Nome del file: ");
 
     while (gets(nome_file))
@@ -58,18 +76,16 @@ int main(int argc, char **argv)
         if (packet == NULL)
         {
             perror("errore nella malloc");
-            printf("Nome del file: ");
             continue;
         }
         strcpy(packet, nome_file);
-        strcat(packet, ";");
+        strcat(packet, "/"); //tokenizzo
         strcat(packet, parola);
 
         len = sizeof(servaddr); // Invio richiesta
         if (sendto(sd, packet, (strlen(packet) + 1), 0, (struct sockaddr *)&servaddr, len) < 0)
         {
             perror("scrittura socket");
-            printf("Nome del file: ");
             continue; // Se l’invio fallisce nuovo ciclo
         }
         // Ricezione del risultato
@@ -79,8 +95,21 @@ int main(int argc, char **argv)
             printf("Nome del file: ");
             continue; /* se la ricezione fallisce nuovo ciclo */
         }
+        result=ntohl(num_file);
+        switch(result){
+            case -1:
+                printf("errore con i parametri passati\n");
+                break;
+            case -2:
+                printf("file non trovato o non apribile\n");
+                break;
+            case -3:
+                printf("errore nella gestione del file\n");
+                break;
+            default:
+                printf("Numero di occorrenze: %i\n", result);
+        }
 
-        printf("Numero di occorrenze trovate: %i\n", ntohl(num_file));
         printf("Nome del file: ");
         free(packet);
     }
