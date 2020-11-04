@@ -75,7 +75,6 @@ int main(int argc, char **argv){
                         break;
                     }
                     else if(buff[i] == ';'){
-                        char toWrite[DIRNAME_SIZE];
                         write(1, startptr, (buff+i) - startptr);
                         printf("\n");
                         startptr = buff+i+1;
