@@ -82,7 +82,7 @@ int main(int argc, char **argv){
                 }
 
                 //scrivo l'ultimo nome file eventualmente rimasto nel buffer
-                if(buff[nread - 1] != ';'){
+                if(!EOS && buff[nread - 1] != ';'){
                     write(1, startptr, (buff+nread) - startptr);
                     printf("\n");
                 }
