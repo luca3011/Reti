@@ -15,7 +15,8 @@
 #define DIM_BUFF 4096
 #define DIRNAME_SIZE 64
 
-void invia_nomi_file(DIR *dir, int connfd){ // Funzione di conteggio dei file nel direttorio
+// Funzione di invio dei file nel sottodirettorio
+void invia_nomi_file(DIR *dir, int connfd){ 
     struct dirent *subdd;
     while ((subdd = readdir(dir)) != NULL){
         //leggo ogni file e lo scrivo (separando ogni nome da ';')
@@ -23,9 +24,10 @@ void invia_nomi_file(DIR *dir, int connfd){ // Funzione di conteggio dei file ne
             char tmp[65];
             strcpy(tmp, subdd->d_name);
             strcat(tmp, ";");
-            write(connfd, tmp, strlen(subdd->d_name)+1);    // bufferizzare la scrittura dei nomi file per eseguire meno system call
+            write(connfd, tmp, strlen(subdd->d_name)+1);    
+            // bufferizzare la scrittura dei nomi file per eseguire meno system call
         }
-    } // conta anche il direttorio stesso e il padre e altri direttori! 
+    }
 }
 
 void scan_subdir(DIR *dir, char *basePath, int connfd){
@@ -33,13 +35,15 @@ void scan_subdir(DIR *dir, char *basePath, int connfd){
     while((dd = readdir(dir)) != NULL){
         DIR *subdir;
         char subdir_name[2*DIRNAME_SIZE];
-        if(strcmp(dd->d_name, ".") != 0 && strcmp(dd->d_name, "..") != 0){   //evito di scorrere la dir corrente o quella sovrastante
+        if(strcmp(dd->d_name, ".") != 0 && strcmp(dd->d_name, "..") != 0){   
+            //evito di scorrere la dir corrente o quella sovrastante
             //costruisco il path della sottocartella
             strcpy(subdir_name, basePath);
             strcat(subdir_name, "/");
             strcat(subdir_name, dd->d_name);
 
-            if((subdir = opendir(subdir_name)) != NULL){ // != NULL --> è una directory che posso aprire (e non un file)
+            if((subdir = opendir(subdir_name)) != NULL){ 
+                // != NULL --> è una directory che posso aprire (e non un file)
                 invia_nomi_file(subdir, connfd);
                 closedir(subdir);
             }
@@ -251,7 +255,8 @@ int main(int argc, char **argv)
             if (fork() == 0){ /* FIGLIO */
                 close(listenfd);
                 printf("Dentro il figlio, pid=%i\n", getpid());
-                while((nread = read(connfd, &nome_dir, sizeof(nome_dir))) != 0){ // Ciclo di gestione richieste con un’unica socket da parte del figlio
+                while((nread = read(connfd, &nome_dir, sizeof(nome_dir))) != 0){ 
+                    // Ciclo di gestione richieste con un’unica socket da parte del figlio
                     if (nread < 0){ // in caso di errore notifico il cliente
                         perror("read");
                         write(connfd, "N", 1);
