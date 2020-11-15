@@ -23,7 +23,7 @@ class Client
 			while((service=stdIn.readLine())!=null){
 				
 				
-				
+				//ciclo di operazioni 
 				
 				
 			} // while

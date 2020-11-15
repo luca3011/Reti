@@ -25,7 +25,30 @@ implements RemOp
 	
 	String elimina_riga(File file_remoto, int soglia)  throws RemoteException
 	{
-		
+		int righe = 0;
+		String result;
+
+		FileReader input = new FileReader(file_remoto);
+
+		while((linea=input.readLine())!=null)
+		{
+				righe++
+		}
+	
+		if(righe>soglia)
+		{
+			
+			
+			
+			//elimiazione righe...
+			
+			
+			return file_modificato + " " + righe;
+		}
+		else
+		{
+			return file_remoto + " -1";
+		}
 		
 		
 		
