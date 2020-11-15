@@ -7,11 +7,20 @@ implements RemOp
 		super(); 
 	}
 	
-	int conta_righe(File file_remoto, int soglia) throws RemoteException
+	int conta_righe(String file_remoto, int soglia) throws RemoteException
 	{
-		
-		
-		
+		int righe = 0;
+
+		FileReader input = new FileReader(file_remoto);
+
+		while((linea=input.readLine())!=null)
+		{
+			linea = linea.trim();
+			if(linea.split("\\s+").lenght>soglia)
+				righe++
+		}
+	
+		return righe;	
 	}
 	
 	String elimina_riga(File file_remoto, int soglia)  throws RemoteException
@@ -27,7 +36,7 @@ implements RemOp
 	
 	public static void main (String[] args){  // Codice di avvio del Server
 		
-		final int REGISTRYPORT = Integer.parseInt(args[]);
+		final int REGISTRYPORT = Integer.parseInt(args[0]);
 		String registryHost = "localhost";
 		String serviceName = "ServerCImpl";
 		try{ // Registrazione del servizio RMI
