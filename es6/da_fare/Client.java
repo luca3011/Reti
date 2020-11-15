@@ -18,16 +18,27 @@ class Client
 			REGISTRYPORT + "/" + serviceName;
 			ServerCongresso serverRMI =(ServerCongresso) Naming.lookup (completeName);
 			
+			String service;
+			
+			System.out.println("Servizio di elimizazione e conteggio righe");
+			System.out.println("Digita C per conta_righe o E per elimina_righe");
 
 			// Ciclo di interazione con l’utente per chiedere operazioni
 			while((service=stdIn.readLine())!=null){
 				
-				
-				//ciclo di operazioni 
+				if(service=="C")
+				{
+					
+				}
+				else if(service=="E")
+				{
+					
+				}
+				else System.out.println("ERRORE INPUT");
 				
 				
 			} // while
 		} //try
-		catch (Exception e){"LEZZO"}
+		catch (Exception e){"LEZZO"};
 	} // main
 } // ClientCongresso
