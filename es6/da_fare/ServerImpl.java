@@ -1,38 +1,57 @@
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.rmi.Naming;
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
+
 public class ServerImpl
-extends UnicastRemoteObject
-implements RemOp
+	extends UnicastRemoteObject
+	implements RemOp
 { 
 	
-	public ServerImpl()throws RemoteException{
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = -6818538881474066631L;
+
+	public ServerImpl() throws RemoteException {
 		super(); 
 	}
 	
-	int conta_righe(String file_remoto, int soglia) throws RemoteException
+	public synchronized int conta_righe(String file_remoto, int soglia) throws RemoteException
 	{
 		int righe = 0;
+		String linea = null;
+		try{
+			BufferedReader fileIn = new BufferedReader(new FileReader(file_remoto));
 
-		FileReader input = new FileReader(file_remoto);
+			while((linea=fileIn.readLine())!=null)
+			{
+				linea = linea.trim();
+				if(linea.split("\\s+").length>soglia)
+					righe++;
+			}
 
-		while((linea=input.readLine())!=null)
-		{
-			linea = linea.trim();
-			if(linea.split("\\s+").lenght>soglia)
-				righe++
+			fileIn.close();
+		}catch(IOException e){
+			throw new RemoteException();
 		}
-	
 		return righe;	
 	}
 	
-	String elimina_riga(File file_remoto, int soglia)  throws RemoteException
+	public synchronized String elimina_riga(String file_remoto, int soglia)  throws RemoteException
 	{
 		int righe = 0;
 		String result;
+		String linea = null;
 
 		FileReader input = new FileReader(file_remoto);
 
 		while((linea=input.readLine())!=null)
 		{
-				righe++
+				righe++;
 		}
 	
 		if(righe>soglia)
@@ -49,12 +68,7 @@ implements RemOp
 		{
 			return file_remoto + " -1";
 		}
-		
-		
-		
-		
-		
-		
+
 	}
 	
 	public static void main (String[] args){  // Codice di avvio del Server
@@ -68,27 +82,9 @@ implements RemOp
 			ServerImpl serverRMI = new ServerImpl();
 			Naming.rebind (completeName, serverRMI);
 		} // try
-		catch (Exception e){"Errore inzializzazione RMI"}
+		catch (Exception e){
+			System.out.println("Errore inzializzazione RMI");
+			e.printStackTrace();
+		}
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 }

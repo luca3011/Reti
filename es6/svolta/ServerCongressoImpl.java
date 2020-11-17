@@ -1,7 +1,15 @@
+import java.rmi.Naming;
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
+
 public class ServerCongressoImpl
-extends UnicastRemoteObject
-implements ServerCongresso
+	extends UnicastRemoteObject
+	implements ServerCongresso
 { 
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = 1L;
 	static Programma prog[]; // si istanzia un programma per giornata
 	
 	// Costruttore
@@ -16,7 +24,7 @@ implements ServerCongresso
 		if (sessione.equals("S1")) 
 			numSess = 0;
 		else if (sessione.equals("S2")) numSess = 1;
-		…
+		//...
 		else if (sessione.equals("S12")) numSess = 11;
 		/* Se i dati sono sbagliati significa che sono stati trasmessi male e quindi si solleva una
 		eccezione */
@@ -51,6 +59,8 @@ implements ServerCongresso
 			ServerCongressoImpl serverRMI = new ServerCongressoImpl();
 			Naming.rebind (completeName, serverRMI);
 		} // try
-		catch (Exception e){ ... }
+		catch (Exception e){
+			e.printStackTrace();
+		}
 	} /* main */ 
 } // ServerCongressoImpl

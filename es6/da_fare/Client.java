@@ -1,8 +1,12 @@
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.rmi.Naming;
+
 class Client
 {
 	public static void main(String[] args) // processo cliente
 	{
-		inal int REGISTRYPORT = Integer.parseInt(args[0]);;
+		final int REGISTRYPORT = Integer.parseInt(args[0]);;
 		String registryHost = null;
 		String serviceName = "ServerImpl";
 		BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
@@ -16,7 +20,7 @@ class Client
 			// Connessione al servizio RMI remoto
 			String completeName = "//" + registryHost + ":" +
 			REGISTRYPORT + "/" + serviceName;
-			ServerCongresso serverRMI =(ServerCongresso) Naming.lookup (completeName);
+			ServerImpl serverRMI =(ServerImpl) Naming.lookup(completeName);
 			
 			String service;
 			
@@ -39,6 +43,9 @@ class Client
 				
 			} // while
 		} //try
-		catch (Exception e){"LEZZO"};
+		catch (Exception e){
+			System.out.println("LEZZO");
+			e.printStackTrace();
+		};
 	} // main
 } // ClientCongresso

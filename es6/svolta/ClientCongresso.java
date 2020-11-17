@@ -1,8 +1,12 @@
-class ClientCongresso
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.rmi.Naming;
+
+public class ClientCongresso
 {
 	public static void main(String[] args) // processo cliente
 	{
-		inal int REGISTRYPORT = 1099;
+		final int REGISTRYPORT = 1099;
 		String registryHost = null;
 		String serviceName = "ServerCongresso";
 		BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
@@ -16,7 +20,7 @@ class ClientCongresso
 			// Connessione al servizio RMI remoto
 			String completeName = "//" + registryHost + ":" +
 			REGISTRYPORT + "/" + serviceName;
-			ServerCongresso serverRMI =(ServerCongresso) Naming.lookup (completeName);
+			ServerCongresso serverRMI = (ServerCongresso) Naming.lookup (completeName);
 			System.out.println("\nRichieste a EOF");
 			System.out.print("Servizio(R=Registrazione, P=Programma): ");
 			
@@ -26,7 +30,7 @@ class ClientCongresso
 			// Ciclo di interazione con l’utente per chiedere operazioni
 			while((service=stdIn.readLine())!=null){
 				if (service.equals("R")){ 
-					ok=false; int g; // lettura giornata
+					ok=false; int g=1; // lettura giornata
 					System.out.print("Giornata (1-3)? ");
 					
 					while (ok!=true){
@@ -39,25 +43,26 @@ class ClientCongresso
 					} // while interno
 					
 					ok=false; 
-					String sess; // lettura sessione
+					String sess=null; // lettura sessione
 					System.out.print("Sessione (S1 - S12)? ");
 					while (ok!=true){
 						sess = stdIn.readLine();
-						if ( !sess.equals("S1") && … !sess.equals("S12")){ 
-						... continue; 
+						if ( !sess.equals("S1") && /*...*/ !sess.equals("S12")){ 
+							System.out.println("Sessione non valida!"); 
+							continue; 
 						} else 
 							ok=true;
 					}
 					System.out.print("Speaker? "); // lettura speaker
 					String speak = stdIn.readLine();
 					// Parametri corretti, invoco il servizio remoto
-					if (serverRMI. Registrazione (gg, sess, speak)==0)
+					if (serverRMI.registrazione(g, sess, speak)==0)
 						System.out.println("Registrazione di …");
 					else 
 						System.out.println("Registrazione non effettuata");
 				}else if (service.equals("P")){ 
-					int g; 
-					boolean ok=false;
+					int g=1; 
+					ok=false;
 					System.out.print("Giornata (1-3)? ");
 					while (ok!=true){
 						g = Integer.parseInt(stdIn.readLine());
@@ -77,6 +82,8 @@ class ClientCongresso
 				System.out.print("Servizio (R=Registrazione, …");
 			} // while
 		} //try
-		catch (Exception e){ ... }
+		catch (Exception e){
+			e.printStackTrace();
+		}
 	} // main
 } // ClientCongresso
