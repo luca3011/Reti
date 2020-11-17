@@ -1,6 +1,8 @@
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
@@ -41,32 +43,58 @@ public class ServerImpl
 		return righe;	
 	}
 	
-	public synchronized String elimina_riga(String file_remoto, int soglia)  throws RemoteException
+	//servono tre parametri (nomefile, soglia minima righe, riga da cancellare)
+	public synchronized String elimina_riga(String file_remoto, int soglia, int riga_da_canc)  throws RemoteException
 	{
 		int righe = 0;
-		String result;
 		String linea = null;
 
-		FileReader input = new FileReader(file_remoto);
+		//controllo num righe (in modo analogo a conta_righe)
+		try{
+			BufferedReader fileIn = new BufferedReader(new FileReader(file_remoto));
 
-		while((linea=input.readLine())!=null)
-		{
-				righe++;
+			while((linea = fileIn.readLine()) != null)
+			{
+				linea = linea.trim();
+				if(linea.split("\\s+").length>soglia)
+					righe++;
+			}
+			fileIn.close();
+		}catch(IOException e){
+			throw new RemoteException();
 		}
 	
 		if(righe>soglia)
 		{
-			
-			
-			
-			//elimiazione righe...
-			
-			
-			return file_modificato + " " + righe;
+			try{
+				File file_temp = new File(file_remoto + "temp");
+				File file_rem = new File(file_remoto);
+				file_temp.createNewFile();
+				BufferedWriter fileOut = new BufferedWriter(new FileWriter(file_temp));
+				BufferedReader fileIn = new BufferedReader(new FileReader(file_rem));
+				
+				//eliminazione riga...
+				for(int numl = 1; (linea = fileIn.readLine()) != null; numl++){
+					if(numl != riga_da_canc)
+						fileOut.write(linea + "\n");
+				}
+				fileOut.flush();
+				fileOut.close();
+				fileIn.close();
+				
+				if(!file_rem.delete())
+					throw new RemoteException("Impossibile sovrascrivere il vecchio file");
+				
+				file_temp.renameTo(file_rem);
+
+				return file_remoto + ": " + righe + " righe";
+			}catch(IOException e){
+				throw new RemoteException();
+			}
 		}
 		else
 		{
-			return file_remoto + " -1";
+			throw new RemoteException("Il numero di righe non supera la soglia");
 		}
 
 	}

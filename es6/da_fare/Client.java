@@ -20,27 +20,27 @@ class Client
 			// Connessione al servizio RMI remoto
 			String completeName = "//" + registryHost + ":" +
 			REGISTRYPORT + "/" + serviceName;
-			ServerImpl serverRMI =(ServerImpl) Naming.lookup(completeName);
+			ServerImpl serverRMI=(ServerImpl)Naming.lookup(completeName);
 			
 			String service;
 			
-			System.out.println("Servizio di elimizazione e conteggio righe");
-			System.out.println("Digita C per conta_righe o E per elimina_righe");
+			System.out.println("Servizio di eliminazione e conteggio righe");
+			System.out.println("Digita C per conta_righe o E per elimina_righe: ");
 
 			// Ciclo di interazione con l’utente per chiedere operazioni
 			while((service=stdIn.readLine())!=null){
 				
-				if(service=="C")
+				if(service.equals("C"))
 				{
 					
 				}
-				else if(service=="E")
+				else if(service.equals("E"))
 				{
 					
 				}
 				else System.out.println("ERRORE INPUT");
 				
-				
+				System.out.println("Digita C per conta_righe o E per elimina_righe: ");
 			} // while
 		} //try
 		catch (Exception e){
