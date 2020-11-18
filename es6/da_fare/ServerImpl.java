@@ -12,7 +12,6 @@ public class ServerImpl
 	extends UnicastRemoteObject
 	implements RemOp
 { 
-	
 
 	private static final long serialVersionUID = -6818538881474066631L;
 
@@ -64,13 +63,14 @@ public class ServerImpl
 				if(numl != riga_da_canc)
 					fileOut.write(linea + "\n");
 			}
-			System.out.println("Righe totali: "+(numl-1));
+			System.out.println("Righe dopo l'eliminazione: "+(numl-2));
 
 			fileOut.flush();
 			fileOut.close();
 			fileIn.close();
 
 			if(riga_da_canc>=(numl)){
+				file_temp.delete();
 				System.out.println("riga da cancellare out of bound");
 				throw new RemoteException("riga da cancellare out of bound");
 			}
