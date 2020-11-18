@@ -55,8 +55,6 @@ public class ServerImpl
 
 			while((linea = fileIn.readLine()) != null)
 			{
-				linea = linea.trim();
-				if(linea.split("\\s+").length>soglia)
 					righe++;
 			}
 			fileIn.close();
@@ -87,7 +85,7 @@ public class ServerImpl
 				
 				file_temp.renameTo(file_rem);
 
-				return file_remoto + ": " + righe + " righe";
+				return file_remoto + ": " + (righe-1) + " righe";
 			}catch(IOException e){
 				throw new RemoteException();
 			}
@@ -100,10 +98,9 @@ public class ServerImpl
 	}
 	
 	public static void main (String[] args){  // Codice di avvio del Server
-		
-		final int REGISTRYPORT = Integer.parseInt(args[0]);
+		final int REGISTRYPORT = 1099;
 		String registryHost = "localhost";
-		String serviceName = "ServerCImpl";
+		String serviceName = "ServerImpl";
 		try{ // Registrazione del servizio RMI
 			String completeName = "//" + registryHost +
 			":" + REGISTRYPORT + "/" + serviceName;
