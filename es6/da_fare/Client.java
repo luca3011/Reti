@@ -34,7 +34,7 @@ class Client
 			// Ciclo di interazione con l’utente per chiedere operazioni
 			while((service=stdIn.readLine())!=null){
 				try{
-					if(service.equals("C"))
+					if(service.toUpperCase().equals("C"))
 					{
 						System.out.print("Inserire il nome del file: ");
 						String file_remoto = stdIn.readLine();
@@ -48,7 +48,7 @@ class Client
 							System.out.println("Errore lato server nella lettura del file. " + e.getMessage());
 						}
 					}
-					else if(service.equals("E"))
+					else if(service.toUpperCase().equals("E"))
 					{
 						System.out.print("Inserire il nome del file: ");
 						String file_remoto = stdIn.readLine();
