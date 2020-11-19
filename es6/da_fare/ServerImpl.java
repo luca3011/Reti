@@ -43,22 +43,21 @@ public class ServerImpl
 		return righe;	
 	}
 	
-	//servono tre parametri (nomefile, soglia minima righe, riga da cancellare)
 	public synchronized String elimina_riga(String file_remoto, int riga_da_canc)  throws RemoteException
 	{
 		String linea = null;
 		System.out.println("Elimino riga:...");
-		//controllo num righe (in modo analogo a conta_righe)
 		
+		File file_temp = new File(file_remoto + "temp");
+		File file_rem = new File(file_remoto);
+		int numl;
 		try{
-			File file_temp = new File(file_remoto + "temp");
-			File file_rem = new File(file_remoto);
 			file_temp.createNewFile();
 			BufferedWriter fileOut = new BufferedWriter(new FileWriter(file_temp));
 			BufferedReader fileIn = new BufferedReader(new FileReader(file_rem));
 				
 			//eliminazione riga...
-			int numl;
+			
 			for(numl = 1; (linea = fileIn.readLine()) != null; numl++){
 				if(numl != riga_da_canc)
 					fileOut.write(linea + "\n");
@@ -68,27 +67,24 @@ public class ServerImpl
 			fileOut.flush();
 			fileOut.close();
 			fileIn.close();
-
-			if(riga_da_canc>=(numl)){
-				file_temp.delete();
-				System.out.println("riga da cancellare out of bound");
-				throw new RemoteException("riga da cancellare out of bound");
-			}
-			
-			if(!file_rem.delete()){
-				System.out.println("Impossibile sovrascrivere il vecchio file");
-				throw new RemoteException("Impossibile sovrascrivere il vecchio file");
-			}
-			file_temp.renameTo(file_rem);
-
-			return file_remoto + ": " + (numl-2) + " righe";
-		
-		}catch(RemoteException e){
-			throw e;
-		}catch(IOException e){	
-			System.out.println("Errore nella rimozione della riga");
-			throw new RemoteException("Errore nella rimozione della riga");
+		} catch (IOException e) {
+			System.out.println("Errore nell'accesso al file");
+			throw new RemoteException("Errore nell'accesso al file");
 		}
+		
+		if(riga_da_canc>=(numl)){
+			file_temp.delete();
+			System.out.println("riga da cancellare out of bound");
+			throw new RemoteException("riga da cancellare out of bound");
+		}
+			
+		if(!file_rem.delete()){
+			System.out.println("Impossibile sovrascrivere il vecchio file");
+			throw new RemoteException("Impossibile sovrascrivere il vecchio file");
+		}
+		file_temp.renameTo(file_rem);
+
+		return file_remoto + ": " + (numl-2) + " righe";
 	}
 	
 	public static void main (String[] args){  // Codice di avvio del Server
