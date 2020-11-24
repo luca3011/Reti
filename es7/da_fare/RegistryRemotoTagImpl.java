@@ -4,7 +4,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.Arrays;
 
 @SuppressWarnings("serial")
-public class RegistryRemotoTagImpl extends RegistryRemotoImpl implements RegistryRemotoTagServer {
+public class RegistryRemotoTagImpl extends UnicastRemoteObject implements RegistryRemotoTagServer {
 
 	final int tableSize = 100; //Tabella: le colonne contengono i 5 tag
 	final int tagNumber = 5;

@@ -2,7 +2,8 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 public interface RegistryRemotoTagClient extends RegistryRemotoClient{
-    
-	public Remote[] cercaTag(String tag) throws RemoteException;
+	
+	//Restituisce i nomi logici dei server come stringa
+	public String[] cercaTag(String tag) throws RemoteException;
 	
 }
