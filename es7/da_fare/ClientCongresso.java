@@ -11,7 +11,7 @@ public class ClientCongresso
 	public static void main(String[] args) // processo cliente
 	{
 		int registryRemotoPort = 1099;
-		String registryRemotoName = "RegistryRemoto";
+		String registryRemotoName = "RegistryRemotoTag";
 		String serviceName = "ServerCongresso";
 		String tipo_ricerca; 
 		
@@ -55,7 +55,7 @@ public class ClientCongresso
 					}
 					
 					try {
-						serverNames=registryRemoto.cercaTag(tag);
+						serverNames = registryRemoto.cercaTag(tag);
 						serverRMI = (ServerCongresso) registryRemoto.cerca(serverNames[0]);
 						//server casuale: serverNames[(int)Math.random()*(serverNames.length)]
 					}

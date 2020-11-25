@@ -6,6 +6,9 @@ public class ServerCongressoImpl extends UnicastRemoteObject
 								implements ServerCongresso { 
 
 	private static final long serialVersionUID = 1L;
+
+	public static final String TAGNAME = "CONGRESSO";
+
 	static Programma prog[]; // si istanzia un programma per giornata
 	
 	// Costruttore
@@ -68,6 +71,7 @@ public class ServerCongressoImpl extends UnicastRemoteObject
 			RegistryRemotoTagServer registryRemoto = (RegistryRemotoTagServer)Naming.lookup(completeRemoteRegistryName);
 			ServerCongressoImpl serverRMI = new ServerCongressoImpl();
 			registryRemoto.aggiungi(serviceName, serverRMI);
+			registryRemoto.associaTag(serviceName, TAGNAME);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
