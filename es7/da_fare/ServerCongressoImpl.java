@@ -46,7 +46,7 @@ public class ServerCongressoImpl extends UnicastRemoteObject
 			prog[i] = new Programma();
 		}
 		int registryRemotoPort = 1099;// default
-		String registryRemotoName = "RegistryRemoto";
+		String registryRemotoName = "RegistryRemotoTag";
 		String serviceName = "ServerCongresso";
 		if (args.length!= 1 && args.length!= 2) {
 			System.out.println("Usage: java ServerCongressoImpl registryRemotoHost [registryRemotoPort]");
@@ -65,7 +65,7 @@ public class ServerCongressoImpl extends UnicastRemoteObject
 											+ ":" + registryRemotoPort 
 											+ "/"+registryRemotoName;
 		try{
-			RegistryRemotoServer registryRemoto = (RegistryRemotoServer)Naming.lookup(completeRemoteRegistryName);
+			RegistryRemotoTagServer registryRemoto = (RegistryRemotoTagServer)Naming.lookup(completeRemoteRegistryName);
 			ServerCongressoImpl serverRMI = new ServerCongressoImpl();
 			registryRemoto.aggiungi(serviceName, serverRMI);
 		} catch (Exception e) {

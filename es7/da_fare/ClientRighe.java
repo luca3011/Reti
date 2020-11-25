@@ -12,7 +12,7 @@ class ClientRighe
 	{
 		int registryPort = 1099;
 		String registryHost = null;
-		String serviceName = "RegistryRemotoTagImpl";
+		String serviceName = "RegistryRemotoTag";
 		BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
 		
 		try{ // Controllo dei parametri della riga di comando

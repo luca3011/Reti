@@ -5,13 +5,11 @@ import java.rmi.RemoteException;
 public class RegistryRemotoTagImpl extends RegistryRemotoImpl implements RegistryRemotoTagServer {
 
 	final String[] TAGS = {"CONGRESSO","RIGHE","TAG3","TAG4","TAG5"};
-    private Boolean[][] tag_table; //Tabella: le colonne contengono i 5 tag
-	private int num_servers;
+    private boolean[][] tag_table; //Tabella: le colonne contengono i 5 tag
 	
 	public RegistryRemotoTagImpl() throws RemoteException {
 		super();
-		tag_table = new Boolean[tableSize][TAGS.length];
-		num_servers = 0;
+		tag_table = new boolean[tableSize][TAGS.length];
 		for(int i=0;i<100;i++)
 		{
 			for(int j=0;j<5;j++)
@@ -22,7 +20,7 @@ public class RegistryRemotoTagImpl extends RegistryRemotoImpl implements Registr
 	}
 
 	
-	public String[] cercaTag(String tag) throws RemoteException {
+	public synchronized String[] cercaTag(String tag) throws RemoteException {
         int cont=0;
         int tagindex=-1;
         Boolean found=false;
@@ -45,30 +43,29 @@ public class RegistryRemotoTagImpl extends RegistryRemotoImpl implements Registr
         cont=0;
         for(int i=0;i<tableSize;i++) {
             if(tag_table[i][tagindex]==true) {
-                risultato[cont++]=(String) table[i][1];
+                risultato[cont++]=(String) table[i][0];
             }
         }
 
         return risultato;
     }
 
-	public int associaTag(String nome_logico_server, String tag) throws RemoteException {
+	public synchronized int associaTag(String nome_logico_server, String tag) throws RemoteException {
 		
 		int index_nome=-1;
 		
-		for(int i=0;i<num_servers;i++)
-		 {
-			 if(nome_logico_server.equals(table[i][0]))
-			 {
-				 index_nome=i;
-				 break;
-			 }
-			 else if(i==101)
-			 {
-				 System.out.println("Nome logico non trovato");
-				 return -1;
-			 }
-		 }
+		for(int i=0;i<tableSize;i++)
+		{
+			if(nome_logico_server.equals(table[i][0]))
+			{
+				index_nome=i;
+				break;
+			}
+		}
+		if(index_nome == -1){
+			System.out.println("Nome logico non trovato");
+			throw new RemoteException("Nome logico non trovato");
+		}
 		
 		int index_tag = -1;
 		for(int i = 0; i<TAGS.length; i++){
@@ -88,9 +85,33 @@ public class RegistryRemotoTagImpl extends RegistryRemotoImpl implements Registr
 		return 1;
 	}
 
-	@Override
 	public static void main(String[] args){
-		
-	}
+		int registryRemotoPort = 1099;
+        String registryRemotoHost = "localhost";
+        String registryRemotoName = "RegistryRemotoTag";
+        if (args.length!= 0 && args.length!= 1){ //Controllo args
+            System.out.println("Usage: RegistryRemotoTagImpl [registryRemotoPort]"); 
+            System.exit(1); 
+        }
+        if (args.length== 1) { 
+            try {
+                registryRemotoPort = Integer.parseInt(args[0]); 
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        // Registrazione RegistryRemoto presso rmiregistry locale
+        String completeName = "//" + registryRemotoHost 
+                            + ":" + registryRemotoPort 
+                            + "/" + registryRemotoName;
+        try{ 
+            RegistryRemotoTagImpl serverRMI = new RegistryRemotoTagImpl();
+            Naming.rebind(completeName, serverRMI);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+	
 
 }

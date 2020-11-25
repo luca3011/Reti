@@ -92,7 +92,7 @@ public class ServerRigheImpl
 	public static void main (String[] args){  // Codice di avvio del Server
 		int registryPort = 1099;
 		String registryHost;
-		String serviceName = "ServerRigheImpl";
+		String serviceName = "ServerRighe";
 		System.out.println("Server: starting...");
 
 		if(args.length != 1 && args.length != 2){
@@ -106,19 +106,16 @@ public class ServerRigheImpl
 		}
 
 		try{
-			// Registrazione del servizio RMI
-			String completeNameServer = "//" + registryHost +
-			":" + registryPort + "/" + serviceName;
-			ServerRigheImpl serverRMI = new ServerRigheImpl();
-			Naming.rebind (completeNameServer, serverRMI);
 
 			// ottengo l'oggetto remoto del Registry su cui chiamare i metodi di aggiunta tag
-			String registryServiceName = "RegistryRemotoTagImpl";
+			String registryServiceName = "RegistryRemotoTag";
 			String completeNameRegistry = "//" + registryHost +
 										":" + registryPort + "/" + registryServiceName;
+										
+			ServerRigheImpl serverRMI = new ServerRigheImpl();
 
 			RegistryRemotoTagServer registryRMI = (RegistryRemotoTagServer)Naming.lookup(completeNameRegistry);
-			registryRMI.aggiungi(serviceName, serverRMI);
+			System.out.println(registryRMI.aggiungi(serviceName, serverRMI));
 			registryRMI.associaTag(serviceName, TAGNAME);
 		} // try
 		catch (Exception e){
