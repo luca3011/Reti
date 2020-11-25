@@ -7,8 +7,8 @@ public class RegistryRemotoImpl extends UnicastRemoteObject implements RegistryR
 
     private static final long serialVersionUID = 1L;
     
-    final int tableSize = 100; //Tabella: la prima colonna contiene inomi, la seconda i riferimenti remoti
-    Object[][] table = new Object[100][2];
+    final int tableSize = 100; //Tabella: la prima colonna contiene i nomi, la seconda i riferimenti remoti
+    Object[][] table = new Object[tableSize][2];
     
     // Costruttore
     public RegistryRemotoImpl() throws RemoteException {
@@ -125,7 +125,7 @@ public class RegistryRemotoImpl extends UnicastRemoteObject implements RegistryR
     public static void main (String[] args) {   
         int registryRemotoPort = 1099;
         String registryRemotoHost = "localhost";
-        String registryRemotoName = "RegistryRemoto";
+        String registryRemotoName = "RegistryRemotoTagImpl";
         if (args.length!= 0 && args.length!= 1){ //Controllo args
             System.out.println("Usage: RegistryRemotoImpl [registryRemotoPort]"); 
             System.exit(1); 

@@ -117,7 +117,7 @@ public class ServerRigheImpl
 			String completeNameRegistry = "//" + registryHost +
 										":" + registryPort + "/" + registryServiceName;
 
-			RegistryRemotoTagServer registryRMI = Naming.lookup(completeNameRegistry);
+			RegistryRemotoTagServer registryRMI = (RegistryRemotoTagServer)Naming.lookup(completeNameRegistry);
 			registryRMI.aggiungi(serviceName, serverRMI);
 			registryRMI.associaTag(serviceName, TAGNAME);
 		} // try

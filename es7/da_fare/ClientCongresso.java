@@ -6,12 +6,14 @@ import java.rmi.RemoteException;
 
 public class ClientCongresso
 {
+	public static final String DEFAULT_TAG = "CONGRESSO";
+
 	public static void main(String[] args) // processo cliente
 	{
 		int registryRemotoPort = 1099;
 		String registryRemotoName = "RegistryRemoto";
 		String serviceName = "ServerCongresso";
-		String service; 
+		String tipo_ricerca; 
 		
 		String tag;
 		BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
@@ -39,24 +41,32 @@ public class ClientCongresso
 			
 			while(serverRMI==null){
 				System.out.println("\nRicerca Server: Tag=T or Name=N ?");
-				service=stdIn.readLine();
-				switch (service) {
-				case "T":
-					String[] Servers=new String[100];
-					System.out.println("Insert Tag:");
+				tipo_ricerca=stdIn.readLine();
+				if(tipo_ricerca.toUpperCase().equals("T")){
+					String[] serverNames;
+					System.out.print("Usare il tag di default '" + DEFAULT_TAG + "'? (S/N):");
 					tag=stdIn.readLine();
+					if(tag.toUpperCase().equals("N")){
+						System.out.print("Inserire tag: ");
+						tag = stdIn.readLine();
+					}
+					else{
+						tag = DEFAULT_TAG;
+					}
+					
 					try {
-					Servers=registryRemoto.cercaTag(tag);}
+						serverNames=registryRemoto.cercaTag(tag);
+						serverRMI = (ServerCongresso) registryRemoto.cerca(serverNames[0]);
+						//server casuale: serverNames[(int)Math.random()*(serverNames.length)]
+					}
 					catch (RemoteException e) {
 						System.out.println(e.getMessage());
 					}
-					serverRMI = (ServerCongresso) registryRemoto.cerca(Servers[(int)Math.random()*(Servers.length)]);
-					break;
-				case "N":
+				}
+				else if(tipo_ricerca.toUpperCase().equals("N"))
 					serverRMI = (ServerCongresso) registryRemoto.cerca(serviceName);
-					break;
-				default:
-					System.out.println("Don't play with me , kid!");
+				else{
+					System.out.println("Selezione non valida");
 					serverRMI=null;
 				}
 			}
@@ -69,8 +79,8 @@ public class ClientCongresso
 			boolean ok;
 
 			// Ciclo di interazione con l’utente per chiedere operazioni
-			while((service=stdIn.readLine())!=null){
-				if (service.equals("R")){ 
+			while((tipo_ricerca=stdIn.readLine())!=null){
+				if (tipo_ricerca.equals("R")){ 
 					ok=false; int g=1; // lettura giornata
 					System.out.print("Giornata (1-3)? ");
 					
@@ -88,10 +98,17 @@ public class ClientCongresso
 					System.out.print("Sessione (S1 - S12)? ");
 					while (ok!=true){
 						sess = stdIn.readLine();
-						if ( !sess.equals("S1") && /*...*/ !sess.equals("S12")){ 
+						if ( !sess.equals("S1") && !sess.equals("S2")
+						&& !sess.equals("S3") && !sess.equals("S4")
+						&& !sess.equals("S5") && !sess.equals("S6")
+						&& !sess.equals("S7") && !sess.equals("S8")
+						&& !sess.equals("S9") && !sess.equals("S10")
+						&& !sess.equals("S11") && !sess.equals("S12"))
+						{ 
 							System.out.println("Sessione non valida!"); 
 							continue; 
-						} else 
+						} 
+						else 
 							ok=true;
 					}
 					System.out.print("Speaker? "); // lettura speaker
@@ -101,7 +118,7 @@ public class ClientCongresso
 						System.out.println("Registrazione di …");
 					else 
 						System.out.println("Registrazione non effettuata");
-				}else if (service.equals("P")){ 
+				}else if (tipo_ricerca.equals("P")){ 
 					int g=1; 
 					ok=false;
 					System.out.print("Giornata (1-3)? ");
