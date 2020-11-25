@@ -1,10 +1,8 @@
-import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
 import java.util.Arrays;
 
 @SuppressWarnings("serial")
-public class RegistryRemotoTagImpl extends UnicastRemoteObject implements RegistryRemotoTagServer {
+public class RegistryRemotoTagImpl extends RegistryRemotoImpl implements RegistryRemotoTagServer {
 
 	final int tableSize = 100; //Tabella: le colonne contengono i 5 tag
 	final int tagNumber = 5;
@@ -24,7 +22,7 @@ public class RegistryRemotoTagImpl extends UnicastRemoteObject implements Regist
 	}
 
 	
-	public Remote[] cercaTag(String tag) throws RemoteException {
+	public String[] cercaTag(String tag) throws RemoteException {
         int cont=0;
         int tagindex=0;
         Boolean found=false;
@@ -34,20 +32,23 @@ public class RegistryRemotoTagImpl extends UnicastRemoteObject implements Regist
                 found=true;
             }
         }
+        if(found==false) {
+        	throw new RemoteException("tag not found");
+        }
+        
         for(int i=0;i<tableSize;i++) {
             if(tag_table[i][tagindex]==true) {
                 cont++;
             }
         }
 
-        Remote[] risultato = new Remote[cont];
+        String[] risultato = new String[cont];
         cont=0;
         for(int i=0;i<tableSize;i++) {
             if(tag_table[i][tagindex]==true) {
-                risultato[cont++]=(Remote) table[i][1];
+                risultato[cont++]=(String) table[i][1];
             }
         }
-
 
         return risultato;
     }

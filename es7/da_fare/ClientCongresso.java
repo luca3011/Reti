@@ -1,6 +1,7 @@
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.rmi.Naming;
+import java.rmi.RemoteException;
 
 
 public class ClientCongresso
@@ -10,6 +11,9 @@ public class ClientCongresso
 		int registryRemotoPort = 1099;
 		String registryRemotoName = "RegistryRemoto";
 		String serviceName = "ServerCongresso";
+		String service; 
+		
+		String tag;
 		BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
 		if (args.length != 1 && args.length != 2) {
 			System.out.println("Usage: ClientCongresso registryRemotoHost [registryRemotoPort]");
@@ -28,15 +32,40 @@ public class ClientCongresso
 			String completeRemoteRegistryName = "//" +  registryRemotoHost 
 												+ ":" + registryRemotoPort 
 												+ "/" + registryRemotoName;
-			RegistryRemotoClient registryRemoto = (RegistryRemotoClient)Naming.lookup(completeRemoteRegistryName);
-			ServerCongresso serverRMI = (ServerCongresso) registryRemoto.cerca(serviceName);
+			RegistryRemotoTagClient registryRemoto = (RegistryRemotoTagClient)Naming.lookup(completeRemoteRegistryName);
+			
+			ServerCongresso serverRMI=null;
+				
+			
+			while(serverRMI==null){
+				System.out.println("\nRicerca Server: Tag=T or Name=N ?");
+				service=stdIn.readLine();
+				switch (service) {
+				case "T":
+					String[] Servers=new String[100];
+					System.out.println("Insert Tag:");
+					tag=stdIn.readLine();
+					try {
+					Servers=registryRemoto.cercaTag(tag);}
+					catch (RemoteException e) {
+						System.out.println(e.getMessage());
+					}
+					serverRMI = (ServerCongresso) registryRemoto.cerca(Servers[(int)Math.random()*(Servers.length)]);
+					break;
+				case "N":
+					serverRMI = (ServerCongresso) registryRemoto.cerca(serviceName);
+					break;
+				default:
+					System.out.println("Don't play with me , kid!");
+					serverRMI=null;
+				}
+			}
 
-			//codice uguale a es6
-
+			
 			System.out.println("\nRichieste a EOF");
 			System.out.print("Servizio(R=Registrazione, P=Programma): ");
 			
-			String service; 
+			
 			boolean ok;
 
 			// Ciclo di interazione con l’utente per chiedere operazioni
