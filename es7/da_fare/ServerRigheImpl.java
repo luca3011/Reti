@@ -15,7 +15,7 @@ public class ServerRigheImpl
 
 	private static final long serialVersionUID = -6818538881474066631L;
 
-	public static final String TAGNAME = "RIGHE";
+	public static final String DEFAULT_TAG = "RIGHE";
 
 	public ServerRigheImpl() throws RemoteException {
 		super(); 
@@ -95,8 +95,8 @@ public class ServerRigheImpl
 		String serviceName = "ServerRighe";
 		System.out.println("Server: starting...");
 
-		if(args.length != 1 && args.length != 2){
-			System.out.println("Usage: java ServerRigheImpl registryRemotoHost [registryRemotoPort]");
+		if(args.length == 0){
+			System.out.println("Usage: java ServerRigheImpl registryRemotoHost [registryRemotoPort] [Tag1 Tag2...TagN]");
 			System.exit(1);
 		}
 
@@ -106,18 +106,33 @@ public class ServerRigheImpl
 		}
 
 		try{
-
-			// ottengo l'oggetto remoto del Registry su cui chiamare i metodi di aggiunta tag
+			// ottengo l'oggetto remoto del Registry 
+			// su cui chiamare i metodi di aggiunta tag
 			String registryServiceName = "RegistryRemotoTag";
 			String completeNameRegistry = "//" + registryHost +
-										":" + registryPort + "/" + registryServiceName;
-										
+					":" + registryPort + "/" + registryServiceName;
+								
+			String[] tags = null;
+			if (args.length > 2) {
+				tags = new String[args.length - 2];
+				for (int i = 2; i < args.length; i++) {
+					tags[i-2] = args[i];
+				}
+			}
 			ServerRigheImpl serverRMI = new ServerRigheImpl();
 
-			RegistryRemotoTagServer registryRMI = (RegistryRemotoTagServer)Naming.lookup(completeNameRegistry);
-			System.out.println(registryRMI.aggiungi(serviceName, serverRMI));
-			registryRMI.associaTag(serviceName, TAGNAME);
-		} // try
+			RegistryRemotoTagServer registryRMI = 
+			(RegistryRemotoTagServer)Naming.lookup(completeNameRegistry);
+			registryRMI.aggiungi(serviceName, serverRMI);
+
+			if(tags == null)
+				registryRMI.associaTag(serviceName, DEFAULT_TAG);
+			else {
+				for (int i = 0; i < tags.length; i++) {
+					registryRMI.associaTag(serviceName, tags[i]);
+				}
+			}
+		}
 		catch (Exception e){
 			System.out.println("Errore inzializzazione RMI");
 			e.printStackTrace();

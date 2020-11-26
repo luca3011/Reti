@@ -10,9 +10,9 @@ public class RegistryRemotoTagImpl extends RegistryRemotoImpl implements Registr
 	public RegistryRemotoTagImpl() throws RemoteException {
 		super();
 		tag_table = new boolean[tableSize][TAGS.length];
-		for(int i=0;i<100;i++)
+		for(int i=0;i<tableSize;i++)
 		{
-			for(int j=0;j<5;j++)
+			for(int j=0;j<TAGS.length;j++)
 			{
 				tag_table[i][j]=false;
 			}
@@ -50,7 +50,8 @@ public class RegistryRemotoTagImpl extends RegistryRemotoImpl implements Registr
         return risultato;
     }
 
-	public synchronized int associaTag(String nome_logico_server, String tag) throws RemoteException {
+    public synchronized int associaTag(String nome_logico_server, String tag) 
+    throws RemoteException {
 		
 		int index_nome=-1;
 		

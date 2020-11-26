@@ -7,7 +7,7 @@ public class ServerCongressoImpl extends UnicastRemoteObject
 
 	private static final long serialVersionUID = 1L;
 
-	public static final String TAGNAME = "CONGRESSO";
+	public static final String DEFAULT_TAG = "CONGRESSO";
 
 	static Programma prog[]; // si istanzia un programma per giornata
 	
@@ -51,14 +51,14 @@ public class ServerCongressoImpl extends UnicastRemoteObject
 		int registryRemotoPort = 1099;// default
 		String registryRemotoName = "RegistryRemotoTag";
 		String serviceName = "ServerCongresso";
-		if (args.length!= 1 && args.length!= 2) {
-			System.out.println("Usage: java ServerCongressoImpl registryRemotoHost [registryRemotoPort]");
+		if (args.length == 0) {
+			System.out.println("Usage: java ServerCongressoImpl registryRemotoHost [registryRemotoPort] [Tag1 Tag2...TagN]");
 		} 
 		// Controlloargomenti
 		String registryRemotoHost = args[0];
-		if (args.length == 2){ 
+		if (args.length == 2) {
 			try {
-				registryRemotoPort = Integer.parseInt(args[0]); 
+				registryRemotoPort = Integer.parseInt(args[1]); 
 			}catch (Exception e) {
 				e.printStackTrace();
 			} 
@@ -66,12 +66,28 @@ public class ServerCongressoImpl extends UnicastRemoteObject
 		// Registrazione servizio presso RegistryRemoto
 		String completeRemoteRegistryName = "//" + registryRemotoHost 
 											+ ":" + registryRemotoPort 
-											+ "/"+registryRemotoName;
-		try{
+				+ "/" + registryRemotoName;
+		
+		String[] tags = null;
+		if (args.length > 2) {
+			tags = new String[args.length - 2];
+			for (int i = 2; i < args.length; i++) {
+				tags[i - 2] = args[i];
+			}
+		}
+		try {
+			
 			RegistryRemotoTagServer registryRemoto = (RegistryRemotoTagServer)Naming.lookup(completeRemoteRegistryName);
 			ServerCongressoImpl serverRMI = new ServerCongressoImpl();
 			registryRemoto.aggiungi(serviceName, serverRMI);
-			registryRemoto.associaTag(serviceName, TAGNAME);
+			if(tags == null)
+				registryRemoto.associaTag(serviceName, DEFAULT_TAG);
+			else {
+				for (int i = 0; i < tags.length; i++) {
+					registryRemoto.associaTag(serviceName, tags[i]);
+				}
+			}
+			registryRemoto.associaTag(serviceName, DEFAULT_TAG);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

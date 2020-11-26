@@ -32,11 +32,11 @@ class ClientRighe
 			String tipo_ricerca, tag;
 			
 			while(serverRMI==null){
-				System.out.println("\nRicerca Server: Tag=T or Name=N ?");
+				System.out.print("\nRicerca Server: Tag=T or Name=N? ");
 				tipo_ricerca=stdIn.readLine();
 				if(tipo_ricerca.toUpperCase().equals("T")){
 					String[] serverNames;
-					System.out.print("Usare il tag di default '" + DEFAULT_TAG + "'? (S/N):");
+					System.out.print("Usare il tag di default '" + DEFAULT_TAG + "'? (S/N): ");
 					tag=stdIn.readLine();
 					if(tag.toUpperCase().equals("N")){
 						System.out.print("Inserire tag: ");
@@ -47,12 +47,25 @@ class ClientRighe
 					}
 					
 					try {
-						serverNames=registryRMI.cercaTag(tag);
-						serverRMI = (ServerRighe) registryRMI.cerca(serverNames[0]);
-						//server casuale: serverNames[(int)Math.random()*(serverNames.length)]
+						serverNames = registryRMI.cercaTag(tag);
+						if (serverNames.length == 0) {
+							System.out.println("Nessun server trovato");
+							continue;
+						}
+
+						System.out.println("Servizi trovati:");
+						for (int i = 0; i < serverNames.length; i++) {
+							System.out.println("(" + i + ")\t" + serverNames[i]);
+						}
+						System.out.print("\nSelezionare il server da raggiungere: (0.." + (serverNames.length - 1) + "): ");
+						int sel = Integer.parseInt(stdIn.readLine());
+						serverRMI = (ServerRighe) registryRMI.cerca(serverNames[sel]);
 					}
 					catch (RemoteException e) {
 						System.out.println(e.getMessage());
+					}
+					catch (NumberFormatException e) {
+						e.printStackTrace();
 					}
 				}
 				else if(tipo_ricerca.toUpperCase().equals("N"))
