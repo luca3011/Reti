@@ -17,7 +17,7 @@ extern "C" {
 struct Output {
 	int caratteri;
 	int parole;
-	int linee;
+	int righe;
 };
 typedef struct Output Output;
 

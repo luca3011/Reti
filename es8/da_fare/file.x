@@ -1,7 +1,7 @@
 struct Output{
     int caratteri;
     int parole;
-    int linee;
+    int righe;
 };
 
 struct Input{

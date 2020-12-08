@@ -14,7 +14,7 @@ xdr_Output (XDR *xdrs, Output *objp)
 		 return FALSE;
 	 if (!xdr_int (xdrs, &objp->parole))
 		 return FALSE;
-	 if (!xdr_int (xdrs, &objp->linee))
+	 if (!xdr_int (xdrs, &objp->righe))
 		 return FALSE;
 	return TRUE;
 }
