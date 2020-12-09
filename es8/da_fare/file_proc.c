@@ -1,13 +1,16 @@
 #include <stdio.h>
 #include <rpc/rpc.h>
+#include <dirent.h>
+
 #include "file.h"
 
 Output * file_scan_1_svc(char **nomefile, struct svc_req *rp){
     static Output result;
+    const int BUF_SIZE = 256;
+
     int caratteri = 0;
     int parole = 1;
     int righe = 1;
-    const int BUF_SIZE = 256;
     char buf[BUF_SIZE];
 
     FILE * infile;
@@ -47,5 +50,30 @@ Output * file_scan_1_svc(char **nomefile, struct svc_req *rp){
 }
 
 int * dir_scan_1_svc(Input *input, struct svc_req *rp){
+    static int result;
+    result = 0;
 
+    DIR *dir = opendir(input->nome);
+    if(dir == NULL){
+        result = -1;
+    }
+    else{
+        struct dirent *dd;
+        while( (dd = readdir(dir)) != NULL){
+            if(dd->d_type == DT_REG){   // se entry è un file
+                FILE *entry = fopen(dd->d_name, "rb");
+                if(entry != NULL){
+                    fseek(entry, 0, SEEK_END);
+                    if(ftell(entry) > input->soglia) //lunghezza del file supera soglia
+                        result++;
+
+                    fclose(entry);
+                }
+            }
+        }
+
+        closedir(dir);
+    }
+
+    return &result;
 }
