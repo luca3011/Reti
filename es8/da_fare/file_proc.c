@@ -49,35 +49,22 @@ Output * file_scan_1_svc(char **nomefile, struct svc_req *rp){
 int * dir_scan_1_svc(Input *input, struct svc_req *rp){
     static int result;
     result = 0;
-<<<<<<< Updated upstream
-
-    DIR *dir = opendir(input->nome);
-    if(dir == NULL){
-        result = -1;
-    }
-=======
     DIR *dir = opendir(input->nome);
     if(dir == NULL)
         result = -1;
 
->>>>>>> Stashed changes
     else{
         struct dirent *dd;
         while( (dd = readdir(dir)) != NULL){
             if(dd->d_type == DT_REG){   // se entry è un file
-<<<<<<< Updated upstream
-                FILE *entry = fopen(dd->d_name, "rb");
-=======
                 
                 char buf[256];
                 snprintf(buf, sizeof buf, "%s/%s", input->nome, dd->d_name);     
                 FILE *entry = fopen(buf, "rb");
->>>>>>> Stashed changes
                 if(entry != NULL){
                     fseek(entry, 0, SEEK_END);
                     if(ftell(entry) > input->soglia) //lunghezza del file supera soglia
                         result++;
-<<<<<<< Updated upstream
 
                     fclose(entry);
                 }
@@ -87,16 +74,5 @@ int * dir_scan_1_svc(Input *input, struct svc_req *rp){
         closedir(dir);
     }
 
-=======
-
-                    fclose(entry);
-                }
-            }
-        }
-
-        closedir(dir);
-    }
-
->>>>>>> Stashed changes
     return &result;
 }
