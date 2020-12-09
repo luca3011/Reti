@@ -19,19 +19,16 @@ Output * file_scan_1_svc(char **nomefile, struct svc_req *rp){
         while( (fgets(buf, BUF_SIZE, infile)) != NULL){
             int i;
             for(i=0; i<strlen(buf); i++){
-                if(buf[i] == ' ' || buf[i] == '\t'){
+                if(buf[i] == ' ' || buf[i] == '\t')
                     parole++;
-                }
-                else if(buf[i] == '\n'){
+                
+                else if(buf[i] == '\n')
                     righe++;
-                }
-                else{
-                    caratteri++;
-                }
+                
+                caratteri++;
             }
         }
-        if(!feof(infile)){
-            //errore: EOF non raggiunta
+        if(!feof(infile)){//errore: EOF non raggiunta
             result.caratteri = result.parole = result.righe = -1;
         }
         else{
@@ -52,20 +49,35 @@ Output * file_scan_1_svc(char **nomefile, struct svc_req *rp){
 int * dir_scan_1_svc(Input *input, struct svc_req *rp){
     static int result;
     result = 0;
+<<<<<<< Updated upstream
 
     DIR *dir = opendir(input->nome);
     if(dir == NULL){
         result = -1;
     }
+=======
+    DIR *dir = opendir(input->nome);
+    if(dir == NULL)
+        result = -1;
+
+>>>>>>> Stashed changes
     else{
         struct dirent *dd;
         while( (dd = readdir(dir)) != NULL){
             if(dd->d_type == DT_REG){   // se entry è un file
+<<<<<<< Updated upstream
                 FILE *entry = fopen(dd->d_name, "rb");
+=======
+                
+                char buf[256];
+                snprintf(buf, sizeof buf, "%s/%s", input->nome, dd->d_name);     
+                FILE *entry = fopen(buf, "rb");
+>>>>>>> Stashed changes
                 if(entry != NULL){
                     fseek(entry, 0, SEEK_END);
                     if(ftell(entry) > input->soglia) //lunghezza del file supera soglia
                         result++;
+<<<<<<< Updated upstream
 
                     fclose(entry);
                 }
@@ -75,5 +87,16 @@ int * dir_scan_1_svc(Input *input, struct svc_req *rp){
         closedir(dir);
     }
 
+=======
+
+                    fclose(entry);
+                }
+            }
+        }
+
+        closedir(dir);
+    }
+
+>>>>>>> Stashed changes
     return &result;
 }
