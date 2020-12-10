@@ -5,7 +5,7 @@ struct Output{
 };
 
 struct Input{
-    string nome <50>;
+    string nome <100>;
     int soglia;
 };
 
@@ -15,3 +15,4 @@ program SCANPROG{
         int DIR_SCAN(Input) = 2;
     } = 1;
 } = 0x20000013;
+

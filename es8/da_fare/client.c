@@ -13,7 +13,7 @@ int main(int argc, char *argv[]){
     char *server;
     char *msg;
     
-    if (argc < 2){
+    if (argc != 2){
         fprintf(stderr, "uso: %s serverhost\n", argv[0]); 
         exit(1);
     }
@@ -26,7 +26,6 @@ int main(int argc, char *argv[]){
 
     msg = (char*)malloc(DIM);
     printf("Scansione: 'F' per conta in un file e 'D' per direttorio, EOF per terminare\n");
-    //printf("Messaggio (max 100 caratteri)? "); 
     /* lettura della stringa da inviare o fine file */
     while(gets(msg)){
         if(toupper(msg[0]) == 'F'){
@@ -43,11 +42,10 @@ int main(int argc, char *argv[]){
                 clnt_perror(cl, server);
                 exit(1);
             }
-            printf("Nel file %s sono stati trovati %d caratteri, %d parole e %d righe\n", msg, file_result->caratteri,file_result->parole,file_result->righe);
-
+            printf("Nel file %s sono stati trovati %d caratteri, %d parole e %d righe\n", 
+                  msg, file_result->caratteri, file_result->parole, file_result->righe);
         }
         else if(toupper(msg[0])=='D'){
-
             printf("Nome del direttorio: (max 100 caratteri)? \n");
             char buff[100];
             gets(buff);
@@ -65,7 +63,8 @@ int main(int argc, char *argv[]){
                   clnt_perror(cl, server);
                   exit(1);
             }
-            printf("Nella directory %s ci sono %d files più grandi di %d bytes\n",dir.nome, *dir_num, dir.soglia);
+            printf("Nella directory %s ci sono %d files più grandi di %d bytes\n", 
+                                                    dir.nome, *dir_num, dir.soglia);
         }
         else{
             continue;

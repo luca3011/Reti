@@ -16,14 +16,20 @@ Output * file_scan_1_svc(char **nomefile, struct svc_req *rp){
     FILE * infile;
 
     if((infile = fopen(*nomefile, "r")) != NULL){
+        int flag = 0;
         while( (fgets(buf, BUF_SIZE, infile)) != NULL){
             int i;
             for(i=0; i<strlen(buf); i++){
                 if(buf[i] == ' ' || buf[i] == '\t')
-                    parole++;
-                
-                else if(buf[i] == '\n')
+                    flag = 1;
+                else if(buf[i] == '\n'){
                     righe++;
+                    flag = 1;
+                }
+                else if(flag){
+                    flag = 0;
+                    parole++;
+                }
                 
                 caratteri++;
             }
@@ -38,8 +44,7 @@ Output * file_scan_1_svc(char **nomefile, struct svc_req *rp){
         }
         fclose(infile);
     }
-    else{
-        //errore: impossibile aprire il file
+    else{ //errore: impossibile aprire il file
         result.caratteri = result.parole = result.righe = -1;
     }
 
@@ -63,10 +68,15 @@ int * dir_scan_1_svc(Input *input, struct svc_req *rp){
                 FILE *entry = fopen(buf, "rb");
                 if(entry != NULL){
                     fseek(entry, 0, SEEK_END);
-                    if(ftell(entry) > input->soglia) //lunghezza del file supera soglia
+                    //se lunghezza del file supera soglia
+                    if(ftell(entry) > input->soglia)
                         result++;
 
                     fclose(entry);
+                }
+                else{
+                    result = -1;
+                    break;
                 }
             }
         }
